@@ -1,0 +1,35 @@
+server:
+  forward-headers-strategy: native
+  servlet:
+    context-path: /api
+
+logging:
+  level:
+    goormthonuniv.team_7_be: INFO
+    org.springframework.security: INFO
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/test?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:1234}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+        dialect: org.hibernate.dialect.MySQL8Dialect
+
+jwt:
+  secret: ${JWT_SECRET:groormthonunivteam7secretkeyforjwtgenerationandvalidationthatissufficientlylong}
+  access-expiration: 86400000 # 1 day
+  refresh-expiration: 604800000 # 7 days
+
+springdoc:
+  swagger-ui:
+    use-root-path: true

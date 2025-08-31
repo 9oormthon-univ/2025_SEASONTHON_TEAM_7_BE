@@ -61,7 +61,7 @@ public class SecurityConfig implements WebMvcConfigurer {
             // 4. 접근 권한 설정 (가장 마지막에 배치)
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
-                    "/login/oauth2/**", "/oauth2/**",
+                    "/login", "/login/oauth2/**", "/oauth2/**",
                     "/swagger-ui/**", "/v3/api-docs/**"
                 ).permitAll()
                 .anyRequest().permitAll() // 개발 편의를 위해 모든 요청 허용 (추후 변경 필요)

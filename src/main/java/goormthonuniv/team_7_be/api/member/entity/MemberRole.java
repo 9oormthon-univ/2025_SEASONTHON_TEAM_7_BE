@@ -1,4 +1,4 @@
-package goormthonuniv.team_7_be.api.entity;
+package goormthonuniv.team_7_be.api.member.entity;
 
 import lombok.Getter;
 

@@ -1,10 +1,10 @@
-package goormthonuniv.team_7_be.api.repository;
+package goormthonuniv.team_7_be.api.member.repository;
 
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import goormthonuniv.team_7_be.api.entity.Member;
+import goormthonuniv.team_7_be.api.member.entity.Member;
 import org.springframework.stereotype.Repository;
 
 @Repository

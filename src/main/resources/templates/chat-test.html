@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>STOMP Chat Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+</head>
+<body>
+<h2>STOMP Chat Test Page</h2>
+
+<div>
+    <label>Chat Room ID:</label>
+    <input type="text" id="chatRoomId" value="1">
+    <button onclick="connect()">Connect</button>
+</div>
+
+<div id="chatArea" style="margin-top:20px; display:none;">
+    <div id="messages" style="border:1px solid #ccc; height:200px; overflow-y:auto; padding:5px;"></div>
+
+    <input type="text" id="messageInput" placeholder="메시지를 입력하세요" style="width:70%;">
+    <button onclick="sendMessage()">Send</button>
+</div>
+
+<script>
+    let stompClient = null;
+    let chatRoomId = null;
+
+    function connect() {
+        chatRoomId = document.getElementById("chatRoomId").value;
+
+        const socket = new SockJS("/api/ws-connect"); // WebSocketConfig에서 설정한 endpoint
+        stompClient = Stomp.over(socket);
+
+        stompClient.connect({}, function () {
+            console.log("Connected");
+
+            document.getElementById("chatArea").style.display = "block";
+
+            stompClient.subscribe("/sub/chat-room/" + chatRoomId, function (message) {
+                const msg = JSON.parse(message.body);
+                showMessage(msg.data.senderName + ": " + msg.data.content);
+            });
+
+            showMessage("채팅방 " + chatRoomId + " 에 연결되었습니다.");
+        });
+    }
+
+    function sendMessage() {
+        const content = document.getElementById("messageInput").value;
+
+        if (content && stompClient) {
+            stompClient.send("/pub/chat.send", {}, JSON.stringify({
+                chatRoomId: chatRoomId,
+                content: content,
+                messageType: "CHAT",
+                contentType: "TEXT"
+            }));
+            document.getElementById("messageInput").value = "";
+        }
+    }
+
+    function showMessage(message) {
+        const messagesDiv = document.getElementById("messages");
+        const p = document.createElement("p");
+        p.innerText = message;
+        messagesDiv.appendChild(p);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+</script>
+</body>
+</html>

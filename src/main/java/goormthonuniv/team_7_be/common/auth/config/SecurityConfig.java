@@ -64,7 +64,7 @@ public class SecurityConfig implements WebMvcConfigurer {
                     "/login/oauth2/**", "/oauth2/**",
                     "/swagger-ui/**", "/v3/api-docs/**"
                 ).permitAll()
-                .anyRequest().authenticated() // 나머지 API는 인증 필요
+                .anyRequest().permitAll() // 개발 편의를 위해 모든 요청 허용 (추후 변경 필요)
             );
 
         return http.build();

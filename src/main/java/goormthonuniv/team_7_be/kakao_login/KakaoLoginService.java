@@ -1,12 +1,12 @@
 package goormthonuniv.team_7_be.kakao_login;
 
-
-import goormthonuniv.team_7_be.api.entity.Member;
-import goormthonuniv.team_7_be.api.repository.MemberRepository;
-import goormthonuniv.team_7_be.common.utils.JwtProvider;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import goormthonuniv.team_7_be.api.member.entity.Member;
+import goormthonuniv.team_7_be.api.member.repository.MemberRepository;
+import goormthonuniv.team_7_be.common.utils.JwtProvider;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -20,7 +20,7 @@ public class KakaoLoginService {
     public TokenDto completeSignUp(String email, SignUpRequestDto requestDto) {
 
         Member member = memberRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
         // 추가 정보 입력 (닉네임, 관심 직군)
         member.completeSignUp(requestDto.getNickname(), requestDto.getInterestedJob());
@@ -34,8 +34,8 @@ public class KakaoLoginService {
 
         // ★ 생성된 토큰들을 DTO에 담아 반환
         return TokenDto.builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .build();
+            .accessToken(accessToken)
+            .refreshToken(refreshToken)
+            .build();
     }
 }

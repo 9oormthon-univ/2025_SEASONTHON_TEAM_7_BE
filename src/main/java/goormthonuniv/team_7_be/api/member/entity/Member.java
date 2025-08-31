@@ -1,5 +1,6 @@
-package goormthonuniv.team_7_be.api.entity;
+package goormthonuniv.team_7_be.api.member.entity;
 
+import goormthonuniv.team_7_be.common.utils.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -10,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "member") // "user"는 DB 예약어인 경우가 많아 "member" 테이블을 사용하는 것을 권장해요.
-public class Member {
+public class Member extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

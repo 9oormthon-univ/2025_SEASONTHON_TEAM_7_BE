@@ -1,23 +1,23 @@
 package goormthonuniv.team_7_be.common.config;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
-import goormthonuniv.team_7_be.api.entity.MemberRole;
-import goormthonuniv.team_7_be.api.repository.MemberRepository;
-import goormthonuniv.team_7_be.common.utils.JwtProvider;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.Map;
+import goormthonuniv.team_7_be.api.member.entity.MemberRole;
+import goormthonuniv.team_7_be.api.member.repository.MemberRepository;
+import goormthonuniv.team_7_be.common.utils.JwtProvider;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
@@ -28,12 +28,13 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
     private final MemberRepository memberRepository;
 
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-        OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
+        Authentication authentication) throws IOException, ServletException {
+        OAuth2User oAuth2User = (OAuth2User)authentication.getPrincipal();
 
         // 사용자의 권한을 확인합니다.
         boolean isGuest = oAuth2User.getAuthorities().stream()
-                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals(MemberRole.GUEST.getKey()));
+            .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals(MemberRole.GUEST.getKey()));
 
         String targetUrl;
 
@@ -48,8 +49,8 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
             // JWT 토큰을 생성합니다.
             Map<String, Object> attributes = oAuth2User.getAttributes();
-            Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
-            String email = (String) kakaoAccount.get("email");
+            Map<String, Object> kakaoAccount = (Map<String, Object>)attributes.get("kakao_account");
+            String email = (String)kakaoAccount.get("email");
 
             String accessToken = jwtProvider.generateAccessToken(email);
             String refreshToken = jwtProvider.generateRefreshToken(email);
@@ -62,11 +63,11 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
             // ★ 프론트엔드의 메인 페이지 URL로 변경해야 합니다.
             targetUrl = UriComponentsBuilder.fromUriString("http://localhost:3000/main")
-                    .queryParam("accessToken", accessToken)
-                    .queryParam("refreshToken", refreshToken)
-                    .build()
-                    .encode(StandardCharsets.UTF_8)
-                    .toUriString();
+                .queryParam("accessToken", accessToken)
+                .queryParam("refreshToken", refreshToken)
+                .build()
+                .encode(StandardCharsets.UTF_8)
+                .toUriString();
         }
 
         // 사용자를 targetUrl로 리디렉션시킵니다.

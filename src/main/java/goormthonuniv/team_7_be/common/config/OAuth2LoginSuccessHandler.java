@@ -13,7 +13,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import goormthonuniv.team_7_be.api.member.entity.MemberRole;
 import goormthonuniv.team_7_be.api.member.repository.MemberRepository;
 import goormthonuniv.team_7_be.common.utils.JwtProvider;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +28,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-        Authentication authentication) throws IOException, ServletException {
+        Authentication authentication) throws IOException {
         OAuth2User oAuth2User = (OAuth2User)authentication.getPrincipal();
 
         // 사용자의 권한을 확인합니다.
@@ -54,6 +53,8 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
             String accessToken = jwtProvider.generateAccessToken(email);
             String refreshToken = jwtProvider.generateRefreshToken(email);
+
+            log.info("Access Token: {}", accessToken);
 
             // DB에 리프레시 토큰을 저장합니다.
             memberRepository.findByEmail(email).ifPresent(member -> {

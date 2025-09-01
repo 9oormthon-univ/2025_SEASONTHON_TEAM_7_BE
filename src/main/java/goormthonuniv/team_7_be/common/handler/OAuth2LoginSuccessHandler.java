@@ -41,7 +41,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
             // 권한이 GUEST인 경우 (신규 사용자)
             log.info("신규 사용자입니다. 추가 정보 입력 페이지로 리디렉션합니다.");
             // ★ 프론트엔드의 추가 정보 입력 페이지 URL로 변경해야 합니다.
-            targetUrl = "http://localhost:3000/signup/extra-info";
+            targetUrl = "http://localhost:5173/signup/extra-info";
         } else {
             // 권한이 USER인 경우 (기존 사용자)
             log.info("기존 사용자입니다. JWT를 발급하고 메인 페이지로 리디렉션합니다.");

@@ -28,7 +28,7 @@ public class ChatRoomController {
 
     private final ChatRoomService chatRoomService;
 
-    @Operation(summary = "채팅방 생성", description = "새로운 채팅방을 생성합니다.")
+    @Operation(summary = "[인증 필요] 채팅방 생성", description = "새로운 채팅방을 생성합니다.")
     @PostMapping
     public ApiResponse<ChatRoomResponse> createChatRoom(
         @Parameter(hidden = true) @Auth Long memberId,
@@ -38,17 +38,20 @@ public class ChatRoomController {
         return ApiResponse.success(response);
     }
 
-    @Operation(summary = "내 채팅방 목록 조회", description = "내가 참여한 모든 채팅방을 조회합니다.")
+    @Operation(summary = "[인증 필요] 내 채팅방 목록 조회", description = "내가 참여한 모든 채팅방을 조회합니다.")
     @GetMapping("/me")
     public ApiResponse<List<ChatRoomResponse>> getMyChatRooms(@Parameter(hidden = true) @Auth Long memberId) {
         List<ChatRoomResponse> responses = chatRoomService.getMyChatRooms(memberId);
         return ApiResponse.success(responses);
     }
 
-    @Operation(summary = "채팅방 메시지 조회", description = "특정 채팅방의 모든 메시지를 조회합니다.")
+    @Operation(summary = "[인증 필요] 채팅방 메시지 조회", description = "특정 채팅방의 모든 메시지를 조회합니다.")
     @GetMapping("/{chatRoomId}/messages")
-    public ApiResponse<List<ChatMessageResponse>> getChatMessages(@PathVariable Long chatRoomId) {
-        List<ChatMessageResponse> responses = chatRoomService.getChatMessages(chatRoomId);
+    public ApiResponse<List<ChatMessageResponse>> getChatMessages(
+        @Parameter(hidden = true) @Auth Long memberId,
+        @PathVariable Long chatRoomId
+    ) {
+        List<ChatMessageResponse> responses = chatRoomService.getChatMessages(chatRoomId, memberId);
         return ApiResponse.success(responses);
     }
 }

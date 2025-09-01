@@ -6,11 +6,13 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "member") // "user"는 DB 예약어인 경우가 많아 "member" 테이블을 사용하는 것을 권장해요.
+@Table(name = "member")
+@ToString
 public class Member extends BaseTimeEntity {
 
     @Id

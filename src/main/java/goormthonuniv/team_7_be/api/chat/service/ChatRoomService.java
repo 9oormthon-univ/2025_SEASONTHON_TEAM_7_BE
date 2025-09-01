@@ -9,6 +9,7 @@ import goormthonuniv.team_7_be.api.chat.dto.request.ChatRoomCreateRequest;
 import goormthonuniv.team_7_be.api.chat.dto.response.ChatMessageResponse;
 import goormthonuniv.team_7_be.api.chat.dto.response.ChatRoomResponse;
 import goormthonuniv.team_7_be.api.chat.entity.ChatRoom;
+import goormthonuniv.team_7_be.api.chat.exception.ChatExceptionType;
 import goormthonuniv.team_7_be.api.chat.repository.ChatMessageRepository;
 import goormthonuniv.team_7_be.api.chat.repository.ChatRoomRepository;
 import goormthonuniv.team_7_be.api.member.entity.Member;
@@ -67,7 +68,15 @@ public class ChatRoomService {
 
     // 특정 채팅방 메시지 조회
     @Transactional(readOnly = true)
-    public List<ChatMessageResponse> getChatMessages(Long chatRoomId) {
+    public List<ChatMessageResponse> getChatMessages(Long chatRoomId, Long memberId) {
+         // 채팅방 존재 여부 및 접근 권한 확인
+        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
+            .orElseThrow(() -> new BaseException(ChatExceptionType.CHAT_ROOM_NOT_FOUND));
+
+        if (!chatRoom.getMember1().getId().equals(memberId) && !chatRoom.getMember2().getId().equals(memberId)) {
+            throw new BaseException(ChatExceptionType.CHAT_ROOM_ACCESS_DENIED);
+        }
+
         return chatMessageRepository.findByChatRoomIdOrderByCreatedAtAsc(chatRoomId)
             .stream()
             .map(ChatMessageResponse::from)

@@ -7,16 +7,24 @@
     <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
 </head>
 <body>
-<h2>STOMP Chat Test Page</h2>
+<h2>STOMP Chat Test Page (JWT 포함)</h2>
 
 <div>
     <label>Chat Room ID:</label>
     <input type="text" id="chatRoomId" value="1">
     <button onclick="connect()">Connect</button>
+    <button onclick="disconnect()">Disconnect</button>
+</div>
+
+<div style="margin-top:12px;">
+    <button onclick="setSampleToken()">샘플 토큰 저장</button>
+    <div>현재 토큰: <span id="tokenDisplay">없음</span></div>
 </div>
 
 <div id="chatArea" style="margin-top:20px; display:none;">
     <div id="messages" style="border:1px solid #ccc; height:200px; overflow-y:auto; padding:5px;"></div>
+
+    <input type="number" id="senderId" placeholder="Sender ID" style="width:10%;">
 
     <input type="text" id="messageInput" placeholder="메시지를 입력하세요" style="width:70%;">
     <button onclick="sendMessage()">Send</button>
@@ -26,13 +34,36 @@
     let stompClient = null;
     let chatRoomId = null;
 
+    function getToken() {
+        return localStorage.getItem("accessToken");
+    }
+
+    function setSampleToken() {
+        const sample = prompt("저장할 JWT 토큰을 입력하세요:", "sample.jwt.token");
+        if (sample) {
+            localStorage.setItem("accessToken", sample);
+            updateTokenDisplay();
+        }
+    }
+
+    function updateTokenDisplay() {
+        const token = getToken();
+        document.getElementById("tokenDisplay").innerText = token ? token : "없음";
+    }
+
     function connect() {
         chatRoomId = document.getElementById("chatRoomId").value;
 
-        const socket = new SockJS("/api/ws-connect"); // WebSocketConfig에서 설정한 endpoint
+        const socket = new SockJS("/api/ws-connect");
         stompClient = Stomp.over(socket);
 
-        stompClient.connect({}, function () {
+        const token = getToken();
+        const headers = {};
+        if (token) {
+            headers["Authorization"] = "Bearer " + token;
+        }
+
+        stompClient.connect(headers, function () {
             console.log("Connected");
 
             document.getElementById("chatArea").style.display = "block";
@@ -43,15 +74,29 @@
             });
 
             showMessage("채팅방 " + chatRoomId + " 에 연결되었습니다.");
+        }, function (error) {
+            console.error("STOMP 연결 실패:", error);
+            alert("연결 실패: " + error);
         });
+    }
+
+    function disconnect() {
+        if (stompClient) {
+            stompClient.disconnect(() => {
+                console.log("Disconnected");
+                document.getElementById("chatArea").style.display = "none";
+            });
+        }
     }
 
     function sendMessage() {
         const content = document.getElementById("messageInput").value;
+        const senderId = document.getElementById("senderId").value;
 
         if (content && stompClient) {
             stompClient.send("/pub/chat.send", {}, JSON.stringify({
                 chatRoomId: chatRoomId,
+                senderId: senderId,
                 content: content,
                 messageType: "CHAT",
                 contentType: "TEXT"
@@ -67,6 +112,9 @@
         messagesDiv.appendChild(p);
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
     }
+
+    // 초기 토큰 표시
+    updateTokenDisplay();
 </script>
 </body>
 </html>

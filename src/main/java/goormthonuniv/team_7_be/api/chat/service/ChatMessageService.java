@@ -28,8 +28,8 @@ public class ChatMessageService {
     private final ChatMessageRepository chatMessageRepository;
 
     // 메시지 전송
-    public ChatMessageResponse send(Long senderId, ChatMessageRequest request) {
-        Member member = memberRepository.findById(senderId)
+    public ChatMessageResponse send(ChatMessageRequest request) {
+        Member member = memberRepository.findById(request.senderId())
             .orElseThrow(() -> new BaseException(MemberExceptionType.MEMBER_NOT_FOUND));
 
         ChatRoom chatRoom = chatRoomRepository.findById(request.chatRoomId())

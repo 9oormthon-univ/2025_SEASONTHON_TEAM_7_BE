@@ -20,7 +20,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import goormthonuniv.team_7_be.common.auth.filter.JwtAuthenticationFilter;
 import goormthonuniv.team_7_be.common.auth.resolver.AuthArgumentResolver;
 import goormthonuniv.team_7_be.common.config.CustomOAuth2UserService;
-import goormthonuniv.team_7_be.common.config.OAuth2LoginSuccessHandler;
+import goormthonuniv.team_7_be.common.handler.OAuth2LoginSuccessHandler;
 import lombok.RequiredArgsConstructor;
 
 @Configuration
@@ -61,10 +61,11 @@ public class SecurityConfig implements WebMvcConfigurer {
             // 4. 접근 권한 설정 (가장 마지막에 배치)
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
-                    "/login", "/login/oauth2/**", "/oauth2/**",
-                    "/swagger-ui/**", "/v3/api-docs/**"
+                    "/login/**", "/oauth2/**",
+                    "/swagger-ui/**", "/v3/api-docs/**",
+                    "/ws-connect/**", "/chat-test", "/pub/**", "/sub/**"
                 ).permitAll()
-                .anyRequest().permitAll() // 개발 편의를 위해 모든 요청 허용 (추후 변경 필요)
+                .anyRequest().authenticated() // 개발 편의를 위해 모든 요청 허용 (추후 변경 필요)
             );
 
         return http.build();

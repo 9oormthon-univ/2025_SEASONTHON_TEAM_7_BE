@@ -1,4 +1,4 @@
-package goormthonuniv.team_7_be.common.config;
+package goormthonuniv.team_7_be.common.handler;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -63,7 +63,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
             });
 
             // ★ 프론트엔드의 메인 페이지 URL로 변경해야 합니다.
-            targetUrl = UriComponentsBuilder.fromUriString("http://localhost:3000/main")
+            targetUrl = UriComponentsBuilder.fromUriString("http://localhost:5173/main")
                 .queryParam("accessToken", accessToken)
                 .queryParam("refreshToken", refreshToken)
                 .build()

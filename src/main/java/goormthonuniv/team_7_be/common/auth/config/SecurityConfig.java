@@ -4,16 +4,11 @@ import java.util.List;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -24,7 +19,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import goormthonuniv.team_7_be.common.auth.filter.JwtAuthenticationFilter;
 import goormthonuniv.team_7_be.common.auth.resolver.AuthArgumentResolver;
-import goormthonuniv.team_7_be.common.auth.service.CustomUserDetailsService;
+import goormthonuniv.team_7_be.common.config.CustomOAuth2UserService;
+import goormthonuniv.team_7_be.common.handler.OAuth2LoginSuccessHandler;
 import lombok.RequiredArgsConstructor;
 
 @Configuration
@@ -32,61 +28,63 @@ import lombok.RequiredArgsConstructor;
 @EnableMethodSecurity(securedEnabled = true)
 @RequiredArgsConstructor
 public class SecurityConfig implements WebMvcConfigurer {
+
+    // JWT 인증과 Argument Resolver에 필요한 의존성
     private final AuthArgumentResolver authArgumentResolver;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    private final CustomUserDetailsService customUserDetailsService;
+
+    // OAuth2 로그인에 필요한 의존성
+    private final CustomOAuth2UserService customOAuth2UserService;
+    private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http
+        http
+            // 1. 기본적인 비활성화 설정
             .csrf(AbstractHttpConfigurer::disable)
             .cors(auth -> auth.configurationSource(corsConfigurationSource()))
             .formLogin(AbstractHttpConfigurer::disable)
             .httpBasic(AbstractHttpConfigurer::disable)
-            .headers(header ->
-                header.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
             .sessionManagement(session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .userDetailsService(customUserDetailsService)
+
+            // 2. JWT 인증 필터를 가장 먼저 배치
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
 
+            // 3. OAuth2 로그인 설정
+            .oauth2Login(oauth2 -> oauth2
+                .userInfoEndpoint(userInfo -> userInfo
+                    .userService(customOAuth2UserService))
+                .successHandler(oAuth2LoginSuccessHandler)
+            )
+
+            // 4. 접근 권한 설정 (가장 마지막에 배치)
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
-                    "/swagger-ui/**",
-                    "/v3/api-docs/**"
+                    "/login/**", "/oauth2/**",
+                    "/swagger-ui/**", "/v3/api-docs/**",
+                    "/ws-connect/**", "/chat-test", "/pub/**", "/sub/**"
                 ).permitAll()
-                .anyRequest().permitAll()) // TODO: 인증 적용 시 변경 필요
-            .build();
+                .anyRequest().authenticated() // 개발 편의를 위해 모든 요청 허용 (추후 변경 필요)
+            );
+
+        return http.build();
     }
 
-    // TODO: 실서버 배포 시 CORS 설정 변경 필요
+    // CORS 설정 (모두 허용)
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.addAllowedOriginPattern("*");
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
-        configuration.addExposedHeader("Authorization");
-        configuration.addExposedHeader("Refresh-Authorization");
-
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
-    }
-
-    @Bean
-    public AuthenticationManager authenticationManager(
-        AuthenticationConfiguration authenticationConfiguration
-    ) throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
-    }
-
+    // 사용자 인증 Argument Resolver 추가
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
         argumentResolvers.add(authArgumentResolver);

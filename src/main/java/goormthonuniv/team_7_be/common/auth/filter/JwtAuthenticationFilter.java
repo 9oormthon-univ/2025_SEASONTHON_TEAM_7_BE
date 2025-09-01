@@ -7,8 +7,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import goormthonuniv.team_7_be.api.repository.MemberRepository;
-import goormthonuniv.team_7_be.common.auth.service.dto.CustomUserDetails;
+import goormthonuniv.team_7_be.api.member.repository.MemberRepository;
+import goormthonuniv.team_7_be.common.auth.service.CustomUserDetails;
 import goormthonuniv.team_7_be.common.utils.JwtProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -29,27 +29,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         FilterChain filterChain)
         throws ServletException, IOException {
 
-        String token = resolveToken(request);
+        String token = jwtProvider.resolveToken(request);
 
         if (token != null && jwtProvider.validateToken(token)) {
-            String username = jwtProvider.getUsernameFromToken(token);
+            String email = jwtProvider.getEmailFromToken(token);
 
-            memberRepository.findByUsername(username).ifPresent(user -> {
-                CustomUserDetails userDetails = new CustomUserDetails(user);
+            // findByUsername -> findByEmail로 변경
+            memberRepository.findByEmail(email).ifPresent(member -> { // user -> member로 변경
+                CustomUserDetails userDetails = new CustomUserDetails(member); // member 객체 사용
                 UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
                     userDetails, "", userDetails.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(auth);
             });
         }
-
         filterChain.doFilter(request, response);
-    }
-
-    private String resolveToken(HttpServletRequest request) {
-        String bearer = request.getHeader("Authorization");
-        if (bearer != null && bearer.startsWith("Bearer ")) {
-            return bearer.substring(7);
-        }
-        return null;
     }
 }

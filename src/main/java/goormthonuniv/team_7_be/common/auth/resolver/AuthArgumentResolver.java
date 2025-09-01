@@ -10,7 +10,7 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
 import goormthonuniv.team_7_be.common.auth.exception.AuthExceptionType;
-import goormthonuniv.team_7_be.common.auth.service.dto.CustomUserDetails;
+import goormthonuniv.team_7_be.common.auth.service.CustomUserDetails;
 import goormthonuniv.team_7_be.common.exception.BaseException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -26,15 +26,15 @@ public class AuthArgumentResolver implements HandlerMethodArgumentResolver {
 
     @Override
     public Object resolveArgument(
-            MethodParameter parameter, ModelAndViewContainer mavContainer,
-            NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
+        MethodParameter parameter, ModelAndViewContainer mavContainer,
+        NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         // 인증 정보가 없는 경우 → IP 주소 반환
         if (authentication == null || !authentication.isAuthenticated()
             || authentication.getPrincipal().equals("anonymousUser")) {
 
-            HttpServletRequest request = (HttpServletRequest) webRequest.getNativeRequest();
+            HttpServletRequest request = (HttpServletRequest)webRequest.getNativeRequest();
             String ip = extractClientIp(request);
 
             log.info("익명 사용자 요청, IP: {}", ip);

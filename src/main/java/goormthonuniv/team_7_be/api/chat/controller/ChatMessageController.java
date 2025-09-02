@@ -1,16 +1,18 @@
 package goormthonuniv.team_7_be.api.chat.controller;
 
+import goormthonuniv.team_7_be.api.chat.dto.request.ChatMessageRequest;
+import goormthonuniv.team_7_be.api.chat.dto.request.ChatReadRequest;
+import goormthonuniv.team_7_be.api.chat.dto.request.MessageReceiptRequest;
+import goormthonuniv.team_7_be.api.chat.dto.response.ChatMessageResponse;
+import goormthonuniv.team_7_be.api.chat.service.ChatMessageService;
+import goormthonuniv.team_7_be.common.auth.resolver.Auth;
+import goormthonuniv.team_7_be.common.response.ApiResponse;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-
-import goormthonuniv.team_7_be.api.chat.dto.request.ChatMessageRequest;
-import goormthonuniv.team_7_be.api.chat.dto.response.ChatMessageResponse;
-import goormthonuniv.team_7_be.api.chat.service.ChatMessageService;
-import goormthonuniv.team_7_be.common.response.ApiResponse;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Controller
@@ -20,13 +22,19 @@ public class ChatMessageController {
     private final ChatMessageService chatMessageService;
     private final SimpMessagingTemplate messagingTemplate;
 
-    @MessageMapping("/chat.send") // 클라이언트에서 /pub/chat.send로 메시지 전송
+    @MessageMapping("/chat.send") // 송
     public void sendMessage(ChatMessageRequest request) {
         ChatMessageResponse response = chatMessageService.send(request);
 
         // 특정 채팅방 구독자들에게 메시지 전송
         messagingTemplate.convertAndSend("/sub/chat-room/" + request.chatRoomId(), ApiResponse.success(response));
     }
+
+    @MessageMapping("/chat/read")
+    public void readMessage(ChatReadRequest request, @Auth Long memberId) {
+        chatMessageService.readMessages(request.chatRoomId(), memberId);
+    }
+
 
     /**
      * 채팅 테스트용 페이지

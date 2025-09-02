@@ -10,7 +10,7 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
 import goormthonuniv.team_7_be.common.auth.exception.AuthExceptionType;
-import goormthonuniv.team_7_be.common.auth.service.CustomUserDetails;
+import goormthonuniv.team_7_be.common.auth.service.CustomOAuth2User;
 import goormthonuniv.team_7_be.common.exception.BaseException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -42,12 +42,12 @@ public class AuthArgumentResolver implements HandlerMethodArgumentResolver {
         }
 
         Object principal = authentication.getPrincipal();
-        if (!(principal instanceof CustomUserDetails userDetails)) {
+        if (!(principal instanceof CustomOAuth2User userDetails)) {
             log.warn("No principal found");
             throw new BaseException(AuthExceptionType.UNAUTHORIZED);
         }
 
-        return Long.parseLong(userDetails.getUsername());
+        return userDetails.getName();
     }
 
     private String extractClientIp(HttpServletRequest request) {

@@ -1,22 +1,27 @@
 package goormthonuniv.team_7_be.api.chat.service;
 
-import java.util.List;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import goormthonuniv.team_7_be.api.chat.dto.request.ChatRoomCreateRequest;
 import goormthonuniv.team_7_be.api.chat.dto.response.ChatMessageResponse;
+import goormthonuniv.team_7_be.api.chat.dto.response.ChatRoomListResponse;
 import goormthonuniv.team_7_be.api.chat.dto.response.ChatRoomResponse;
+import goormthonuniv.team_7_be.api.chat.entity.ChatMessage;
 import goormthonuniv.team_7_be.api.chat.entity.ChatRoom;
+import goormthonuniv.team_7_be.api.chat.entity.MessageReceiptStatus;
 import goormthonuniv.team_7_be.api.chat.exception.ChatExceptionType;
 import goormthonuniv.team_7_be.api.chat.repository.ChatMessageRepository;
 import goormthonuniv.team_7_be.api.chat.repository.ChatRoomRepository;
+import goormthonuniv.team_7_be.api.chat.repository.MessageReceiptRepository;
 import goormthonuniv.team_7_be.api.member.entity.Member;
 import goormthonuniv.team_7_be.api.member.exception.MemberExceptionType;
 import goormthonuniv.team_7_be.api.member.repository.MemberRepository;
 import goormthonuniv.team_7_be.common.exception.BaseException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
 
 @Service
 @Transactional
@@ -26,6 +31,7 @@ public class ChatRoomService {
     private final MemberRepository memberRepository;
     private final ChatRoomRepository chatRoomRepository;
     private final ChatMessageRepository chatMessageRepository;
+    private final MessageReceiptRepository messageReceiptRepository;
 
     public ChatRoomResponse createChatRoom(Long memberId, ChatRoomCreateRequest request) {
         // Member 조회
@@ -55,15 +61,22 @@ public class ChatRoomService {
 
     // 내가 참여한 채팅방 목록
     @Transactional(readOnly = true)
-    public List<ChatRoomResponse> getMyChatRooms(Long currentMemberId) {
+    public List<ChatRoomListResponse> getMyChatRooms(Long currentMemberId) {
+        Member currentMember = memberRepository.findById(currentMemberId)
+                .orElseThrow(() -> new BaseException(MemberExceptionType.MEMBER_NOT_FOUND));
+
         return chatRoomRepository.findByMember1IdOrMember2Id(currentMemberId, currentMemberId)
-            .stream()
-            .map(room -> {
-                Member member1 = room.getMember1();
-                Member member2 = room.getMember2();
-                return ChatRoomResponse.from(room, member1, member2);
-            })
-            .toList();
+                .stream()
+                .map(room -> {
+                    Member opponent = Objects.equals(room.getMember1().getId(), currentMemberId) ? room.getMember2() : room.getMember1();
+                    ChatMessage lastMessage = chatMessageRepository.findTopByChatRoomOrderByCreatedAtDesc(room);
+                    long unreadCount = messageReceiptRepository.countByChatRoomIdAndMemberIdAndStatus(
+                            room.getId(), currentMemberId, MessageReceiptStatus.DELIVERED);
+
+                    return ChatRoomListResponse.from(room, opponent, lastMessage, (int) unreadCount);
+                })
+                .sorted(Comparator.comparing(ChatRoomListResponse::getLastMessageAt, Comparator.nullsLast(Comparator.reverseOrder())))
+                .toList();
     }
 
     // 특정 채팅방 메시지 조회

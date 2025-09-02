@@ -63,7 +63,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
             });
 
             // ★ 프론트엔드의 메인 페이지 URL로 변경해야 합니다.
-            targetUrl = UriComponentsBuilder.fromUriString("http://localhost:5173/main")
+            targetUrl = UriComponentsBuilder.fromUriString("http://localhost:5173")
                 .queryParam("accessToken", accessToken)
                 .queryParam("refreshToken", refreshToken)
                 .build()

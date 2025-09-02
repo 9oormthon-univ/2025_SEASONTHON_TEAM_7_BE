@@ -22,7 +22,7 @@ public class ChatMessageController {
     private final ChatMessageService chatMessageService;
     private final SimpMessagingTemplate messagingTemplate;
 
-    @MessageMapping("/chat/send") // 클라이언트에서 /pub/chat/send로 메시지 전송
+    @MessageMapping("/chat.send") // 송
     public void sendMessage(ChatMessageRequest request) {
         ChatMessageResponse response = chatMessageService.send(request);
 

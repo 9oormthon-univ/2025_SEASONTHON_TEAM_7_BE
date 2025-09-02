@@ -4,10 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -18,7 +15,7 @@ public class KakaoLoginController {
 
     private final KakaoLoginService kakaoLoginService;
 
-    @PostMapping("/auth/signup")
+    @PostMapping("/signup")
     // ★ 반환 타입을 ResponseEntity<TokenDto>로 변경
     public ResponseEntity<TokenDto> completeSignUp(
             @AuthenticationPrincipal OAuth2User oAuth2User,

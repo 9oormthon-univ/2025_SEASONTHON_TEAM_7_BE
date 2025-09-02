@@ -2,6 +2,7 @@ package goormthonuniv.team_7_be.common.auth.service;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -9,46 +10,26 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import goormthonuniv.team_7_be.api.member.entity.Member;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 @RequiredArgsConstructor
-public class CustomUserDetails implements UserDetails {
+public class CustomUserDetails implements OAuth2User {
 
     private final Member member;
+
+    @Override
+    public Map<String, Object> getAttributes() {
+        return Map.of();
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.singleton(new SimpleGrantedAuthority(member.getRole().getKey()));
     }
 
-    @Override
-    public String getPassword() {
-        return null;
-    }
 
     @Override
-    public String getUsername() {
-        // AuthArgumentResolver가 Long.parseLong()을 사용하므로 ID를 문자열로 반환합니다.
-        return member.getId().toString();
-    }
-
-    // 아래 계정 상태 관련 메서드들은 모두 true로 설정합니다.
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
+    public String getName() {
+        return "";
     }
 }

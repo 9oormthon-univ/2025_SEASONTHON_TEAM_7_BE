@@ -4,6 +4,8 @@ import java.io.IOException;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -22,6 +24,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtProvider jwtProvider;
     private final MemberRepository memberRepository;
+    private OAuth2User OAuth2UserPrincipal;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -37,8 +40,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // findByUsername -> findByEmail로 변경
             memberRepository.findByEmail(email).ifPresent(member -> { // user -> member로 변경
                 CustomUserDetails userDetails = new CustomUserDetails(member); // member 객체 사용
-                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                    userDetails, "", userDetails.getAuthorities());
+                OAuth2AuthenticationToken auth = new OAuth2AuthenticationToken(
+                        userDetails, "kakao");
                 SecurityContextHolder.getContext().setAuthentication(auth);
             });
         }

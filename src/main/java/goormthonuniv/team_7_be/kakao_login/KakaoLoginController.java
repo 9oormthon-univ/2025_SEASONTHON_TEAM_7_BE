@@ -15,7 +15,7 @@ public class KakaoLoginController {
 
     private final KakaoLoginService kakaoLoginService;
 
-    @PostMapping("/auth/signup")
+    @PostMapping("/signup")
     // ★ 반환 타입을 ResponseEntity<TokenDto>로 변경
     public ResponseEntity<TokenDto> completeSignUp(
             @AuthenticationPrincipal OAuth2User oAuth2User,

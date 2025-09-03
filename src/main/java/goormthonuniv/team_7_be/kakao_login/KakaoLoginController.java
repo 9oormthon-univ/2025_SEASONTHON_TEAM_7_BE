@@ -1,7 +1,9 @@
 package goormthonuniv.team_7_be.kakao_login;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,16 +20,16 @@ public class KakaoLoginController {
     private final KakaoLoginService kakaoLoginService;
 
     @PostMapping("/signup")
-    // ★ 반환 타입을 ResponseEntity<TokenDto>로 변경
     public ResponseEntity<TokenDto> completeSignUp(
-        @AuthenticationPrincipal OAuth2User oAuth2User,
-        @RequestBody SignUpRequestDto requestDto) {
-        String email = oAuth2User.getAttribute("email");
+            // ★ 수정된 부분: @AuthenticationPrincipal 파라미터 제거
+            @RequestBody SignUpRequestDto requestDto) {
 
-        // ★ 서비스에서 TokenDto를 반환받음
+        // ★ 수정된 부분: SecurityContext에서 직접 인증 정보를 가져와 이메일 추출
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+
         TokenDto tokenDto = kakaoLoginService.completeSignUp(email, requestDto);
 
-        // ★ 반환받은 토큰을 클라이언트에게 전달
         return ResponseEntity.ok(tokenDto);
     }
 }

@@ -28,50 +28,53 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-        Authentication authentication) throws IOException {
+                                        Authentication authentication) throws IOException {
         OAuth2User oAuth2User = (OAuth2User)authentication.getPrincipal();
 
-        // 사용자의 권한을 확인합니다.
         boolean isGuest = oAuth2User.getAuthorities().stream()
-            .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals(MemberRole.GUEST.getKey()));
+                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals(MemberRole.GUEST.getKey()));
+
+        // ★ 수정된 부분: 이메일 정보는 공통으로 사용하므로 미리 추출
+        Map<String, Object> attributes = oAuth2User.getAttributes();
+        Map<String, Object> kakaoAccount = (Map<String, Object>)attributes.get("kakao_account");
+        String email = (String)kakaoAccount.get("email");
 
         String targetUrl;
 
         if (isGuest) {
-            // 권한이 GUEST인 경우 (신규 사용자)
-            log.info("신규 사용자입니다. 추가 정보 입력 페이지로 리디렉션합니다.");
-            // ★ 프론트엔드의 추가 정보 입력 페이지 URL로 변경해야 합니다.
-            targetUrl = "http://localhost:5173/signup/extra-info";
+            // ★ 수정된 부분: GUEST일 경우 임시 토큰 발급 및 URL에 추가
+            log.info("신규 사용자입니다. 회원가입용 임시 토큰을 발급하여 리디렉션합니다. email={}", email);
+
+            String signupToken = jwtProvider.generateSignupToken(email);
+
+            targetUrl = UriComponentsBuilder.fromUriString("http://localhost:5173/signup/extra-info")
+                    .queryParam("signupToken", signupToken)
+                    .build()
+                    .encode(StandardCharsets.UTF_8)
+                    .toUriString();
+
         } else {
             // 권한이 USER인 경우 (기존 사용자)
-            log.info("기존 사용자입니다. JWT를 발급하고 메인 페이지로 리디렉션합니다.");
-
-            // JWT 토큰을 생성합니다.
-            Map<String, Object> attributes = oAuth2User.getAttributes();
-            Map<String, Object> kakaoAccount = (Map<String, Object>)attributes.get("kakao_account");
-            String email = (String)kakaoAccount.get("email");
+            log.info("기존 사용자입니다. JWT를 발급하고 메인 페이지로 리디렉션합니다. email={}", email);
 
             String accessToken = jwtProvider.generateAccessToken(email);
             String refreshToken = jwtProvider.generateRefreshToken(email);
 
             log.info("Access Token: {}", accessToken);
 
-            // DB에 리프레시 토큰을 저장합니다.
             memberRepository.findByEmail(email).ifPresent(member -> {
                 member.updateRefreshToken(refreshToken);
                 memberRepository.save(member);
             });
 
-            // ★ 프론트엔드의 메인 페이지 URL로 변경해야 합니다.
             targetUrl = UriComponentsBuilder.fromUriString("http://localhost:5173")
-                .queryParam("accessToken", accessToken)
-                .queryParam("refreshToken", refreshToken)
-                .build()
-                .encode(StandardCharsets.UTF_8)
-                .toUriString();
+                    .queryParam("accessToken", accessToken)
+                    .queryParam("refreshToken", refreshToken)
+                    .build()
+                    .encode(StandardCharsets.UTF_8)
+                    .toUriString();
         }
 
-        // 사용자를 targetUrl로 리디렉션시킵니다.
         getRedirectStrategy().sendRedirect(request, response, targetUrl);
     }
 }

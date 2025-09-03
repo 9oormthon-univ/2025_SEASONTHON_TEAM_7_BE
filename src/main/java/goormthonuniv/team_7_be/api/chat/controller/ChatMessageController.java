@@ -1,18 +1,18 @@
 package goormthonuniv.team_7_be.api.chat.controller;
 
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+
 import goormthonuniv.team_7_be.api.chat.dto.request.ChatMessageRequest;
 import goormthonuniv.team_7_be.api.chat.dto.request.ChatReadRequest;
-import goormthonuniv.team_7_be.api.chat.dto.request.MessageReceiptRequest;
 import goormthonuniv.team_7_be.api.chat.dto.response.ChatMessageResponse;
 import goormthonuniv.team_7_be.api.chat.service.ChatMessageService;
 import goormthonuniv.team_7_be.common.auth.resolver.Auth;
 import goormthonuniv.team_7_be.common.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
 
 @Slf4j
 @Controller
@@ -34,7 +34,6 @@ public class ChatMessageController {
     public void readMessage(ChatReadRequest request, @Auth Long memberId) {
         chatMessageService.readMessages(request.chatRoomId(), memberId);
     }
-
 
     /**
      * 채팅 테스트용 페이지

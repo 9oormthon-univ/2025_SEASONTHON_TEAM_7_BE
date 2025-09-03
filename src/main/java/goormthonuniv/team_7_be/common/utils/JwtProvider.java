@@ -21,12 +21,25 @@ public class JwtProvider {
     @Value("${jwt.refresh-expiration}")
     private long refreshExpiration;
 
+    // ★ 수정된 부분: 회원가입용 토큰 만료 시간 (10분)
+    private final long signupExpiration = 1000L * 60 * 10;
+
     public String generateAccessToken(String email) {
         return Jwts.builder()
                 .setSubject(email) // subject를 email로 설정
                 .claim("email", email) // claim에 email 추가
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + accessExpiration))
+                .signWith(Keys.hmacShaKeyFor(secret.getBytes()), SignatureAlgorithm.HS512)
+                .compact();
+    }
+
+    public String generateSignupToken(String email) {
+        return Jwts.builder()
+                .setSubject(email)
+                .claim("email", email)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + signupExpiration))
                 .signWith(Keys.hmacShaKeyFor(secret.getBytes()), SignatureAlgorithm.HS512)
                 .compact();
     }

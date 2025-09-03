@@ -32,28 +32,28 @@ public class ChatRoomController {
     @Operation(summary = "[인증 필요] 채팅방 생성", description = "새로운 채팅방을 생성합니다.")
     @PostMapping
     public ApiResponse<ChatRoomResponse> createChatRoom(
-        @Parameter(hidden = true) @Auth Long memberId,
+        @Parameter(hidden = true) @Auth String username,
         @RequestBody ChatRoomCreateRequest request
     ) {
-        ChatRoomResponse response = chatRoomService.createChatRoom(memberId, request);
+        ChatRoomResponse response = chatRoomService.createChatRoom(username, request);
         return ApiResponse.success(response);
     }
 
     @Operation(summary = "[인증 필요] 내 채팅방 목록 조회", description = "내가 참여한 모든 채팅방을 조회합니다.")
     @GetMapping("/me")
-    public ApiResponse<List<ChatRoomListResponse>> getMyChatRooms(@Parameter(hidden = true) @Auth Long memberId) {
+    public ApiResponse<List<ChatRoomListResponse>> getMyChatRooms(@Parameter(hidden = true) @Auth String username) {
         // 변수 타입과 ApiResponse의 제네릭 타입을 서비스의 반환 타입과 일치시킵니다.
-        List<ChatRoomListResponse> responses = chatRoomService.getMyChatRooms(memberId);
+        List<ChatRoomListResponse> responses = chatRoomService.getMyChatRooms(username);
         return ApiResponse.success(responses);
     }
 
     @Operation(summary = "[인증 필요] 채팅방 메시지 조회", description = "특정 채팅방의 모든 메시지를 조회합니다.")
     @GetMapping("/{chatRoomId}/messages")
     public ApiResponse<List<ChatMessageResponse>> getChatMessages(
-        @Parameter(hidden = true) @Auth Long memberId,
+        @Parameter(hidden = true) @Auth String username,
         @PathVariable Long chatRoomId
     ) {
-        List<ChatMessageResponse> responses = chatRoomService.getChatMessages(chatRoomId, memberId);
+        List<ChatMessageResponse> responses = chatRoomService.getChatMessages(chatRoomId, username);
         return ApiResponse.success(responses);
     }
 }

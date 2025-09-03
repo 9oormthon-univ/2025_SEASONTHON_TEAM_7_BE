@@ -3,6 +3,7 @@ package goormthonuniv.team_7_be.common.auth.resolver;
 import org.springframework.core.MethodParameter;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
@@ -41,13 +42,15 @@ public class AuthArgumentResolver implements HandlerMethodArgumentResolver {
             return ip;
         }
 
-        Object principal = authentication.getPrincipal();
-        if (!(principal instanceof CustomOAuth2User userDetails)) {
+        OAuth2User oAuth2User = (OAuth2User)authentication.getPrincipal();
+        String email = oAuth2User.getAttribute("email");
+
+        if (email == null || email.isBlank()) {
             log.warn("No principal found");
             throw new BaseException(AuthExceptionType.UNAUTHORIZED);
         }
 
-        return userDetails.getName();
+        return email;
     }
 
     private String extractClientIp(HttpServletRequest request) {

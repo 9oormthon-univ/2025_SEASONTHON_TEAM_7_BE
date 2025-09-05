@@ -33,8 +33,8 @@ public class ChatMessageService {
     private final MessageReceiptRepository messageReceiptRepository;
 
     // 메시지 전송
-    public ChatMessageResponse send(ChatMessageRequest request) {
-        Member sender = memberRepository.findById(request.senderId())
+    public ChatMessageResponse send(ChatMessageRequest request, String email) {
+        Member sender = memberRepository.findByEmail(email)
             .orElseThrow(() -> new BaseException(MemberExceptionType.MEMBER_NOT_FOUND));
 
         ChatRoom chatRoom = chatRoomRepository.findById(request.chatRoomId())

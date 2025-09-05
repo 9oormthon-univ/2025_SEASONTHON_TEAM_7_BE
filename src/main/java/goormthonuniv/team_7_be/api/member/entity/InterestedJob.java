@@ -8,6 +8,5 @@ public enum InterestedJob {
     영화,    // Movies
     스마트기기, // Smart Devices
     건강,    // Health
-    스포츠,  // Sports
-    스터디   // Study
+    스포츠  // Sports
 }

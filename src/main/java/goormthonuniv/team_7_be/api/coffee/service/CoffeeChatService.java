@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import goormthonuniv.team_7_be.api.coffee.dto.request.CoffeeChatCreateRequest;
+import goormthonuniv.team_7_be.api.coffee.dto.request.CoffeeChatUpdateRequest;
 import goormthonuniv.team_7_be.api.coffee.dto.response.CoffeeChatResponse;
 import goormthonuniv.team_7_be.api.coffee.entity.CoffeeChat;
 import goormthonuniv.team_7_be.api.coffee.entity.CoffeeChatStatus;
@@ -70,5 +71,25 @@ public class CoffeeChatService {
                 .status(CoffeeChatStatus.REQUESTED)
                 .build()
         );
+    }
+
+    public void updateStatus(CoffeeChatUpdateRequest request, String username) {
+        Member receiver = memberRepository.findByEmail(username)
+            .orElseThrow(() -> new BaseException(MemberExceptionType.MEMBER_NOT_FOUND));
+
+        CoffeeChat coffeeChat = coffeeChatRepository.findById(request.coffeeChatId())
+            .orElseThrow(() -> new BaseException(CoffeeChatExceptionType.COFFEE_CHAT_NOT_FOUND));
+
+        if (!coffeeChat.getReceiver().getId().equals(receiver.getId())) {
+            throw new BaseException(CoffeeChatExceptionType.COFFEE_CHAT_FORBIDDEN);
+        }
+
+        if (coffeeChat.getStatus() != CoffeeChatStatus.REQUESTED) {
+            throw new BaseException(CoffeeChatExceptionType.COFFEE_CHAT_INVALID_STATUS);
+        }
+
+        // TODO: 거절 시 알림 보내기
+
+        coffeeChat.updateStatus(request.status());
     }
 }

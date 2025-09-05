@@ -1,19 +1,15 @@
 package goormthonuniv.team_7_be.api.member.entity;
 
 import goormthonuniv.team_7_be.common.utils.BaseTimeEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -31,7 +27,20 @@ public class Member extends BaseTimeEntity {
 
     private String nickname; // 추가 정보: 닉네임
 
-    private String interestedJob; // 추가 정보: 관심 직군
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private MemberAge memberAge; // 추가정보 : 연령대
+
+    @ElementCollection(fetch = FetchType.LAZY) // 지연 로딩 설정
+    @CollectionTable(
+            name = "member_interest", // enum 값들을 저장할 별도의 테이블 이름
+            joinColumns = @JoinColumn(name = "member_id") // 해당 테이블에서 Member를 참조하기 위한 외래 키
+    )
+    @Enumerated(EnumType.STRING) // enum의 이름을 DB에 문자열로 저장
+    @Column(name = "interest_name") // enum 값이 저장될 컬럼의 이름
+    private List<InterestedJob> interests = new ArrayList<>(); // 관심사 목록
+
+    private String introduceMySelf; // 추가정보 : 자기소개란
 
     private Double mannerScore; // 매너 점수 (평균 점수)
 
@@ -47,15 +56,16 @@ public class Member extends BaseTimeEntity {
         this.role = role;
     }
 
-    /**
-     * 추가 정보(닉네임, 관심 직군)를 업데이트하고 권한을 GUEST에서 USER로 변경
+    /*
+    피그마 반영 최신본
      */
-    public void completeSignUp(String nickname, String interestedJob) {
+    public void completeSignUp(String nickname, List<InterestedJob> interests, String introduceMySelf, MemberAge memberAge) {
         this.nickname = nickname;
-        this.interestedJob = interestedJob;
-        this.role = MemberRole.USER; // 회원가입 완료 시 USER 권한으로 변경
+        this.introduceMySelf = introduceMySelf;
+        this.memberAge = memberAge;
+        this.role = MemberRole.USER;
+        this.interests = interests; // 전달받은 리스트로 바로 교체
     }
-
     /**
      * 매너 점수 업데이트
      */

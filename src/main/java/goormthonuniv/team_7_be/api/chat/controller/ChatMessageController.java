@@ -24,7 +24,7 @@ public class ChatMessageController {
     private final ChatMessageService chatMessageService;
     private final SimpMessagingTemplate messagingTemplate;
 
-    @MessageMapping("/chat.send") // 송
+    @MessageMapping("/chat.send")
     public void sendMessage(ChatMessageRequest request, Principal principal) {
         String username = principal.getName();
         ChatMessageResponse response = chatMessageService.send(request, username);

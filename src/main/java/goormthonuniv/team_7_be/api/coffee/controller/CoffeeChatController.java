@@ -1,12 +1,14 @@
 package goormthonuniv.team_7_be.api.coffee.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import goormthonuniv.team_7_be.api.coffee.dto.request.CoffeeChatCreateRequest;
+import goormthonuniv.team_7_be.api.coffee.dto.request.CoffeeChatUpdateRequest;
 import goormthonuniv.team_7_be.api.coffee.service.CoffeeChatService;
 import goormthonuniv.team_7_be.common.auth.resolver.Auth;
 import goormthonuniv.team_7_be.common.response.ApiResponse;
@@ -43,6 +45,17 @@ public class CoffeeChatController {
         @Valid @RequestBody CoffeeChatCreateRequest request
     ) {
         coffeeChatService.createCoffeeChat(request, username);
+        return ApiResponse.success();
+    }
+
+    @Operation(summary = "커피챗 요청 상태 변경", description = "커피챗 요청 상태를 변경합니다. <br>"
+        + "[REQUESTED, ACCEPTED, DECLINED, COMPLETED] 상태로 변경할 수 있습니다.")
+    @PatchMapping
+    public ApiResponse<Void> acceptCoffeeChat(
+        @Parameter(hidden = true) @Auth String username,
+        @Valid @RequestBody CoffeeChatUpdateRequest request
+    ) {
+        coffeeChatService.updateStatus(request, username);
         return ApiResponse.success();
     }
 }

@@ -23,7 +23,12 @@ public class KakaoLoginService {
             .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
         // 추가 정보 입력 (닉네임, 관심 직군)
-        member.completeSignUp(requestDto.getNickname(), requestDto.getInterestedJob());
+        member.completeSignUp(
+                requestDto.getNickname(),
+                requestDto.getInterests(),
+                requestDto.getIntroduceMySelf(),
+                requestDto.getMemberAge()
+        );
 
         // ★ JWT 토큰 생성 로직 추가
         String accessToken = jwtProvider.generateAccessToken(email);

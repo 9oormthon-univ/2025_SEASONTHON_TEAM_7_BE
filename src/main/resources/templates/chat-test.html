@@ -24,8 +24,6 @@
 <div id="chatArea" style="margin-top:20px; display:none;">
     <div id="messages" style="border:1px solid #ccc; height:200px; overflow-y:auto; padding:5px;"></div>
 
-    <input type="number" id="senderId" placeholder="Sender ID" style="width:10%;">
-
     <input type="text" id="messageInput" placeholder="메시지를 입력하세요" style="width:70%;">
     <button onclick="sendMessage()">Send</button>
 </div>
@@ -91,12 +89,10 @@
 
     function sendMessage() {
         const content = document.getElementById("messageInput").value;
-        const senderId = document.getElementById("senderId").value;
 
         if (content && stompClient) {
             stompClient.send("/pub/chat.send", {}, JSON.stringify({
                 chatRoomId: chatRoomId,
-                senderId: senderId,
                 content: content,
                 messageType: "CHAT",
                 contentType: "TEXT"

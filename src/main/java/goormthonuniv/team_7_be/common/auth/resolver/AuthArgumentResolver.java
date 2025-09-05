@@ -42,8 +42,7 @@ public class AuthArgumentResolver implements HandlerMethodArgumentResolver {
             return ip;
         }
 
-        OAuth2User oAuth2User = (OAuth2User)authentication.getPrincipal();
-        String email = oAuth2User.getAttribute("email");
+        String email = authentication.getPrincipal().toString();
 
         if (email == null || email.isBlank()) {
             log.warn("No principal found");

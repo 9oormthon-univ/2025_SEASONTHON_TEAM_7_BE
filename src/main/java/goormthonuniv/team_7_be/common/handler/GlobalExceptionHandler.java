@@ -11,6 +11,7 @@ import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -24,6 +25,12 @@ public class GlobalExceptionHandler {
         ExceptionType exceptionType = e.exceptionType();
         log.warn("{} URI: {}", exceptionType.getMessage(), request.getRequestURI());
         return ApiResponse.error(exceptionType.getMessage());
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    ApiResponse<?> handleNoResourceFoundException(HttpServletRequest request, NoResourceFoundException e) {
+        log.warn("존재하지 않는 리소스에 접근했습니다. URI: {}", request.getRequestURI());
+        return ApiResponse.error(BaseExceptionType.RESOURCE_NOT_FOUND.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

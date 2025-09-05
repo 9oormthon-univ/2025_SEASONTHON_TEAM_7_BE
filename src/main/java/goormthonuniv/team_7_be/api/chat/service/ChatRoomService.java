@@ -75,7 +75,7 @@ public class ChatRoomService {
 
                     return ChatRoomListResponse.from(room, opponent, lastMessage, (int) unreadCount);
                 })
-                .sorted(Comparator.comparing(ChatRoomListResponse::getLastMessageAt, Comparator.nullsLast(Comparator.reverseOrder())))
+                .sorted(Comparator.comparing(ChatRoomListResponse::lastMessageAt, Comparator.nullsLast(Comparator.reverseOrder())))
                 .toList();
     }
 

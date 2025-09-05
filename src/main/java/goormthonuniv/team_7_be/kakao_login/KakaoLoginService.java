@@ -17,10 +17,12 @@ public class KakaoLoginService {
 
     @Transactional
     // ★ 반환 타입을 TokenDto로 변경
-    public TokenDto completeSignUp(String email, SignUpRequestDto requestDto) {
+    public TokenDto completeSignUp(String email, String profileImageUrl ,SignUpRequestDto requestDto) {
 
         Member member = memberRepository.findByEmail(email)
             .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+
+        member.updateProfileImageUrl(profileImageUrl);
 
         // 추가 정보 입력 (닉네임, 관심 직군)
         member.completeSignUp(

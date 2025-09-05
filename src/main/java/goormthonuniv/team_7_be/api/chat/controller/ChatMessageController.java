@@ -1,5 +1,7 @@
 package goormthonuniv.team_7_be.api.chat.controller;
 
+import java.security.Principal;
+
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
@@ -23,8 +25,9 @@ public class ChatMessageController {
     private final SimpMessagingTemplate messagingTemplate;
 
     @MessageMapping("/chat.send") // 송
-    public void sendMessage(ChatMessageRequest request) {
-        ChatMessageResponse response = chatMessageService.send(request);
+    public void sendMessage(ChatMessageRequest request, Principal principal) {
+        String username = principal.getName();
+        ChatMessageResponse response = chatMessageService.send(request, username);
 
         // 특정 채팅방 구독자들에게 메시지 전송
         messagingTemplate.convertAndSend("/sub/chat-room/" + request.chatRoomId(), ApiResponse.success(response));

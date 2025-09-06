@@ -52,8 +52,9 @@ public class Member extends BaseTimeEntity {
     private String refreshToken; // 리프레시 토큰
 
     @Builder
-    public Member(String email, MemberRole role) {
+    public Member(String email, MemberRole role, String profileImageUrl) {
         this.email = email;
+        this.profileImageUrl=profileImageUrl;
         this.role = role;
     }
 

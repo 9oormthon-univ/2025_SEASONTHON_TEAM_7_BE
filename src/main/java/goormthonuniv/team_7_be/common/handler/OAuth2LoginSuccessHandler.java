@@ -39,6 +39,9 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         Map<String, Object> kakaoAccount = (Map<String, Object>)attributes.get("kakao_account");
         String email = (String)kakaoAccount.get("email");
 
+
+        log.info(attributes.toString());
+
         String targetUrl;
 
         if (isGuest) {

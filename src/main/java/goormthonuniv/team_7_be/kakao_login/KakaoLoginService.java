@@ -13,10 +13,9 @@ import lombok.RequiredArgsConstructor;
 public class KakaoLoginService {
 
     private final MemberRepository memberRepository;
-    private final JwtProvider jwtProvider; // ★ 주석 해제 및 final 추가
+    private final JwtProvider jwtProvider;
 
     @Transactional
-    // ★ 반환 타입을 TokenDto로 변경
     public TokenDto completeSignUp(String email, String profileImageUrl, SignUpRequestDto requestDto) {
 
         Member member = memberRepository.findByEmail(email)
@@ -44,5 +43,10 @@ public class KakaoLoginService {
             .accessToken(accessToken)
             .refreshToken(refreshToken)
             .build();
+    }
+
+    @Transactional(readOnly = true)
+    public Boolean validateNickname(String nickname) {
+        return memberRepository.existsByNickname(nickname);
     }
 }

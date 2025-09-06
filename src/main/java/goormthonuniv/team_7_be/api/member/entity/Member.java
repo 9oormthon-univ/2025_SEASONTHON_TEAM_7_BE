@@ -30,7 +30,6 @@ public class Member extends BaseTimeEntity {
 //    private String profileImageUrl;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private MemberAge memberAge; // 추가정보 : 연령대
 
     @ElementCollection(fetch = FetchType.LAZY) // 지연 로딩 설정

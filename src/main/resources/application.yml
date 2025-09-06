@@ -6,7 +6,7 @@ server:
 logging:
   level:
     goormthonuniv.team_7_be: INFO
-    org.springframework.security: INFO
+    org.springframework.security: DEBUG
 
 spring:
   datasource:

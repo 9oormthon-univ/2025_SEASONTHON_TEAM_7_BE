@@ -2,6 +2,7 @@ package goormthonuniv.team_7_be.api.member.dto;
 
 import goormthonuniv.team_7_be.api.member.entity.Member;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -12,7 +13,9 @@ public record MemberProfileDto(
         String age,
         String introduction,
         Double mannerScore,
-        List<String> interests
+        List<String> interests,
+        Boolean isActive,
+        LocalDateTime lastActiveAt
 ) {
     public static MemberProfileDto from(Member member) {
         return new MemberProfileDto(
@@ -24,7 +27,9 @@ public record MemberProfileDto(
                 member.getMannerScore(),
                 member.getInterests().stream()
                         .map(interest -> "#" + interest.name())
-                        .collect(Collectors.toList())
+                        .collect(Collectors.toList()),
+                member.getIsActive(),
+                member.getLastActiveAt()
         );
     }
 }

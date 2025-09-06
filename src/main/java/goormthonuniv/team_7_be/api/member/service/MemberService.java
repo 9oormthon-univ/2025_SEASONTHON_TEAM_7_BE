@@ -24,7 +24,7 @@ public class MemberService {
     private final CoffeeChatRepository coffeeChatRepository;
 
     public List<MemberProfileDto> findAllMemberProfiles(String username) {
-        List<Member> members = memberRepository.findAllNotInEmailAndRole(username, MemberRole.USER);
+        List<Member> members = memberRepository.findAllNotInEmailAndRoleOrderByLastActiveAtDesc(username, MemberRole.USER);
         return members.stream()
                 .map(MemberProfileDto::from)
                 .toList();

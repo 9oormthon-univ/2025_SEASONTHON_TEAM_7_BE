@@ -18,7 +18,7 @@ import org.springframework.stereotype.Repository;
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
     @Query("SELECT m FROM Member m WHERE m.email <> :email ORDER BY m.createdAt DESC")
-    List<Member> findAllNotInEmailAndRole(@Param("email") String email,  @Param("role") MemberRole role);
+    List<Member> findAllNotInEmailAndRoleOrderByLastActiveAtDesc(@Param("email") String email,  @Param("role") MemberRole role);
 
     Optional<Member> findByEmail(String email);
 

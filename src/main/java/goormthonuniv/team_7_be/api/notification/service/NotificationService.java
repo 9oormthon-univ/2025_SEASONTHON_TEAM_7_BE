@@ -1,12 +1,18 @@
 package goormthonuniv.team_7_be.api.notification.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import goormthonuniv.team_7_be.api.member.entity.Member;
+import goormthonuniv.team_7_be.api.member.exception.MemberExceptionType;
+import goormthonuniv.team_7_be.api.member.repository.MemberRepository;
+import goormthonuniv.team_7_be.api.notification.dto.response.NotificationResponse;
 import goormthonuniv.team_7_be.api.notification.entity.Notification;
 import goormthonuniv.team_7_be.api.notification.entity.NotificationType;
 import goormthonuniv.team_7_be.api.notification.repository.NotificationRepository;
+import goormthonuniv.team_7_be.common.exception.BaseException;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -14,7 +20,27 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class NotificationService {
 
+    private final MemberRepository memberRepository;
     private final NotificationRepository notificationRepository;
+
+    @Transactional(readOnly = true)
+    public List<NotificationResponse> getAllNotifications() {
+        List<Notification> notifications = notificationRepository.findAllByOrderByCreatedAtDesc();
+        return notifications.stream()
+            .map(NotificationResponse::from)
+            .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<NotificationResponse> getMyNotifications(String email) {
+        Member member = memberRepository.findByEmail(email)
+            .orElseThrow(() -> new BaseException(MemberExceptionType.MEMBER_NOT_FOUND));
+
+        List<Notification> notifications = notificationRepository.findAllByReceiverOrderByCreatedAtDesc(member);
+        return notifications.stream()
+            .map(NotificationResponse::from)
+            .toList();
+    }
 
     public void notifyCoffeeChatRequested(Member sender, Member receiver) {
         String senderName = displayName(sender);

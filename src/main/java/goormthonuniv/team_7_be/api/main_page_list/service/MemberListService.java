@@ -2,6 +2,7 @@ package goormthonuniv.team_7_be.api.main_page_list.service;
 
 import goormthonuniv.team_7_be.api.main_page_list.dto.MemberProfileDto;
 import goormthonuniv.team_7_be.api.member.entity.Member;
+import goormthonuniv.team_7_be.api.member.entity.MemberRole;
 import goormthonuniv.team_7_be.api.member.exception.MemberExceptionType;
 import goormthonuniv.team_7_be.api.member.repository.MemberRepository;
 import goormthonuniv.team_7_be.common.exception.BaseException;
@@ -19,7 +20,7 @@ public class MemberListService {
     private final MemberRepository memberRepository;
 
     public List<MemberProfileDto> findAllMemberProfiles(String username) {
-        List<Member> members = memberRepository.findAllNotInEmail(username);
+        List<Member> members = memberRepository.findAllNotInEmailAndRole(username, MemberRole.USER);
         return members.stream()
                 .map(MemberProfileDto::from)
                 .toList();

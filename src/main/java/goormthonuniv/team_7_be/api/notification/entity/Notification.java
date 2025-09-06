@@ -34,6 +34,8 @@ public class Notification extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private NotificationType type;
 
+    private Long referencedId;
+
     private String message;
 
     @Enumerated(EnumType.STRING)
@@ -42,9 +44,10 @@ public class Notification extends BaseTimeEntity {
     private LocalDateTime readAt;
 
     @Builder
-    public Notification(Member receiver, NotificationType type, String message) {
+    public Notification(Member receiver, Long referencedId, NotificationType type, String message) {
         this.receiver = receiver;
         this.type = type;
+        this.referencedId = referencedId;
         this.message = message;
         this.status = NotificationStatus.UNREAD;
     }

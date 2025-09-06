@@ -1,10 +1,5 @@
 package goormthonuniv.team_7_be.api.notification.service;
 
-import java.util.List;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import goormthonuniv.team_7_be.api.member.entity.Member;
 import goormthonuniv.team_7_be.api.member.exception.MemberExceptionType;
 import goormthonuniv.team_7_be.api.member.repository.MemberRepository;
@@ -14,6 +9,10 @@ import goormthonuniv.team_7_be.api.notification.entity.NotificationType;
 import goormthonuniv.team_7_be.api.notification.repository.NotificationRepository;
 import goormthonuniv.team_7_be.common.exception.BaseException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @Transactional
@@ -27,25 +26,32 @@ public class NotificationService {
     public List<NotificationResponse> getAllNotifications() {
         List<Notification> notifications = notificationRepository.findAllByOrderByCreatedAtDesc();
         return notifications.stream()
-            .map(NotificationResponse::from)
-            .toList();
+                .map(NotificationResponse::from)
+                .toList();
     }
 
     @Transactional(readOnly = true)
     public List<NotificationResponse> getMyNotifications(String email) {
         Member member = memberRepository.findByEmail(email)
-            .orElseThrow(() -> new BaseException(MemberExceptionType.MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new BaseException(MemberExceptionType.MEMBER_NOT_FOUND));
 
         List<Notification> notifications = notificationRepository.findAllByReceiverOrderByCreatedAtDesc(member);
         return notifications.stream()
-            .map(NotificationResponse::from)
-            .toList();
+                .map(NotificationResponse::from)
+                .toList();
     }
 
-    public void notifyCoffeeChatRequested(Member sender, Member receiver) {
+    public void notifyCoffeeChatRequested(Member sender, Member receiver, Long referencedId) {
         String senderName = displayName(sender);
         String message = String.format("%s 님이 커피챗을 요청했습니다.", senderName);
-        save(receiver, NotificationType.COFFEE_CHAT_REQUEST, message);
+        notificationRepository.save(
+                Notification.builder()
+                        .receiver(receiver)
+                        .type(NotificationType.COFFEE_CHAT_REQUEST)
+                        .referencedId(referencedId)
+                        .message(message)
+                        .build()
+        );
     }
 
     public void notifyCoffeeChatDeclined(Member decliner, Member requester) {
@@ -66,11 +72,11 @@ public class NotificationService {
 
     private void save(Member receiver, NotificationType type, String message) {
         notificationRepository.save(
-            Notification.builder()
-                .receiver(receiver)
-                .type(type)
-                .message(message)
-                .build()
+                Notification.builder()
+                        .receiver(receiver)
+                        .type(type)
+                        .message(message)
+                        .build()
         );
     }
 }

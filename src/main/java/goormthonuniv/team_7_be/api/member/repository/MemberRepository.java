@@ -3,6 +3,7 @@ package goormthonuniv.team_7_be.api.member.repository;
 import java.util.List;
 import java.util.Optional;
 
+import goormthonuniv.team_7_be.api.member.entity.MemberRole;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import goormthonuniv.team_7_be.api.member.entity.Member;
@@ -15,7 +16,7 @@ import org.springframework.stereotype.Repository;
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
     @Query("SELECT m FROM Member m WHERE m.email <> :email ORDER BY m.createdAt DESC")
-    List<Member> findAllNotInEmail(@Param("email") String email);
+    List<Member> findAllNotInEmailAndRole(@Param("email") String email,  @Param("role") MemberRole role);
     Optional<Member> findByEmail(String email);
     Boolean existsByNickname(String nickname);
 }

@@ -20,7 +20,7 @@ public class NotificationEventListener {
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void onCoffeeChatRequested(CoffeeChatRequestedEvent event) {
-        notificationService.notifyCoffeeChatRequested(event.getSender(), event.getReceiver());
+        notificationService.notifyCoffeeChatRequested(event.sender(), event.receiver(), event.referencedId());
     }
 
     @Async

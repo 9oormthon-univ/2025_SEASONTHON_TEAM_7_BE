@@ -66,16 +66,16 @@ public class CoffeeChatService {
             throw new BaseException(CoffeeChatExceptionType.DUPLICATE_COFFEE_CHAT_REQUEST);
         }
 
-        // 이벤트 발행: 커피챗 요청 알림
-        eventPublisher.publishEvent(new CoffeeChatRequestedEvent(sender, receiver));
-
-        coffeeChatRepository.save(
+        CoffeeChat coffeeChat = coffeeChatRepository.save(
             CoffeeChat.builder()
                 .sender(sender)
                 .receiver(receiver)
                 .status(CoffeeChatStatus.REQUESTED)
                 .build()
         );
+
+        // 이벤트 발행: 커피챗 요청 알림
+        eventPublisher.publishEvent(new CoffeeChatRequestedEvent(sender, receiver, coffeeChat.getId()));
     }
 
     public void updateStatus(CoffeeChatUpdateRequest request, String username) {

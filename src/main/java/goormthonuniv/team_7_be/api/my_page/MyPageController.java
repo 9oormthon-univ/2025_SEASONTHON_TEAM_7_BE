@@ -21,13 +21,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class MyPageController {
 
     private final MyPageService myPageService;
-    private final MemberRepository memberRepository;
+
 
     @GetMapping
     public ApiResponse<MyPageDto> getMyPage(
-            @Parameter(hidden = true) @Auth Long memberId) { // @Auth로 Long 타입의 memberId를 바로 주입받음
+            @Parameter(hidden = true) @Auth String username) { // @Auth로 Long 타입의 memberId를 바로 주입받음
 
-        MyPageDto myPageDto = myPageService.getMyPageInfo(memberId);
+        MyPageDto myPageDto = myPageService.getMyPageInfo(username);
         return ApiResponse.success(myPageDto);
     }
 }

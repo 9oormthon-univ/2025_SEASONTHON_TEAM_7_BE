@@ -18,10 +18,14 @@ public class MyPageDto {
     private String nickname;
     private String profileImageUrl;
     public Double mannerScore;
+
+    @Builder.Default
     private List<InterestedJob> interests = new ArrayList<InterestedJob>();
     private String introduceMySelf;
+
 
     private String reviewerName;
     private String reviewerComment;
     private LocalDateTime reviewDate;
+    private String reviewerProfileImageUrl;
 }

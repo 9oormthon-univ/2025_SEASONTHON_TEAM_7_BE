@@ -40,7 +40,7 @@ public class MemberService {
         CoffeeChat coffeeChat = coffeeChatRepository.findById(coffeeChatId)
                 .orElseThrow(() -> new BaseException(CoffeeChatExceptionType.COFFEE_CHAT_NOT_FOUND));
 
-        Member member = memberRepository.findById(coffeeChat.getReceiver().getId())
+        Member member = memberRepository.findById(coffeeChat.getSender().getId())
                 .orElseThrow(() -> new BaseException(MemberExceptionType.MEMBER_NOT_FOUND));
 
         return MemberProfileDto.from(member);

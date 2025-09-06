@@ -24,8 +24,6 @@ public class MyPageDto {
     private String introduceMySelf;
 
 
-    private String reviewerName;
-    private String reviewerComment;
-    private LocalDateTime reviewDate;
-    private String reviewerProfileImageUrl;
+    private List<ReviewDto> reviews;
+
 }

@@ -32,10 +32,14 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         // 카카오로부터 받은 사용자 정보(Map)
         Map<String, Object> attributes = oAuth2User.getAttributes();
         Map<String, Object> kakaoAccount = (Map<String, Object>)attributes.get("kakao_account");
+        Map<String, Object> properties = (Map<String, Object>) attributes.get("properties");
+
         String email = (String)kakaoAccount.get("email");
+        String profileImageUrl = (String) properties.get("profile_image");
+
 
         // 이메일로 DB에서 사용자를 찾아, 없으면 GUEST로 새로 생성합니다.
-        Member member = findOrCreateMember(email);
+        Member member = findOrCreateMember(email, profileImageUrl);
 
         // Spring Security의 DefaultOAuth2User 객체를 생성하여 반환합니다.
         return new DefaultOAuth2User(
@@ -45,12 +49,13 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         );
     }
 
-    private Member findOrCreateMember(String email) {
+    private Member findOrCreateMember(String email, String profileImageUrl) {
         return memberRepository.findByEmail(email)
             .orElseGet(() -> {
                 Member newMember = Member.builder()
                     .email(email)
-                    .role(MemberRole.GUEST)
+                        .profileImageUrl(profileImageUrl)
+                        .role(MemberRole.GUEST)
                     .build();
                 return memberRepository.save(newMember);
             });

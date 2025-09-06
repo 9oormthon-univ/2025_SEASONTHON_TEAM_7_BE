@@ -38,7 +38,7 @@ public class MemberController {
     }
 
     @Operation(summary = "커피챗 아이디로 프로필 조회")
-    @GetMapping
+    @GetMapping("/coffee")
     public ApiResponse<MemberProfileDto> getMemberProfile(
             @Parameter(hidden = true) @Auth String username,
             @RequestParam Long coffeeChatId

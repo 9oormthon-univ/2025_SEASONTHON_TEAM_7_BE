@@ -44,11 +44,16 @@ public class MannerService {
         Member targetMember = memberRepository.findById(request.memberId())
             .orElseThrow(() -> new BaseException(MemberExceptionType.MEMBER_NOT_FOUND));
 
+        Member reviewer = memberRepository.findById(request.reviewerId())
+                .orElseThrow(() -> new BaseException(MemberExceptionType.MEMBER_NOT_FOUND));
+
+
         // 매너 평가 생성
         targetMember.updateMannerScore(request.rate());
         Manner manner = mannerRepository.save(
             Manner.builder()
-                .member(targetMember)
+                .receiver(targetMember)
+                .reviewer(reviewer)
                 .rate(request.rate())
                 .review(request.review())
                 .build()

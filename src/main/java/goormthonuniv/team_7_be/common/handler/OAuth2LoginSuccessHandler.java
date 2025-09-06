@@ -50,7 +50,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
             String signupToken = jwtProvider.generateSignupToken(email);
 
-            targetUrl = UriComponentsBuilder.fromUriString("https://teetalk.vercel.app//signup/extra-info")
+            targetUrl = UriComponentsBuilder.fromUriString("https://teetalk.vercel.app/signup/extra-info")
                     .queryParam("signupToken", signupToken)
                     .build()
                     .encode(StandardCharsets.UTF_8)

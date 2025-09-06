@@ -6,6 +6,7 @@ import goormthonuniv.team_7_be.api.chat.dto.response.ChatRoomListResponse;
 import goormthonuniv.team_7_be.api.chat.dto.response.ChatRoomResponse;
 import goormthonuniv.team_7_be.api.chat.entity.ChatMessage;
 import goormthonuniv.team_7_be.api.chat.entity.ChatRoom;
+import goormthonuniv.team_7_be.api.chat.entity.ChatRoomStatus;
 import goormthonuniv.team_7_be.api.chat.entity.MessageReceiptStatus;
 import goormthonuniv.team_7_be.api.chat.exception.ChatExceptionType;
 import goormthonuniv.team_7_be.api.chat.repository.ChatMessageRepository;
@@ -57,6 +58,13 @@ public class ChatRoomService {
         ChatRoom chatRoom = chatRoomRepository.save(newRoom);
 
         return ChatRoomResponse.from(chatRoom, me, opponent);
+    }
+
+    public void updateChatRoomStatus(Long chatRoomId) {
+        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
+                .orElseThrow(() -> new BaseException(ChatExceptionType.CHAT_ROOM_NOT_FOUND));
+
+        chatRoom.closed();
     }
 
     // 내가 참여한 채팅방 목록

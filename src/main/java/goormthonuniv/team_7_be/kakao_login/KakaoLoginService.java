@@ -46,6 +46,6 @@ public class KakaoLoginService {
 
     @Transactional(readOnly = true)
     public Boolean validateNickname(String nickname) {
-        return memberRepository.existsByNickname(nickname);
+        return !memberRepository.existsByNickname(nickname);
     }
 }

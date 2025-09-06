@@ -4,6 +4,7 @@ import java.util.List;
 
 import goormthonuniv.team_7_be.api.chat.dto.response.ChatRoomListResponse;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -37,6 +38,13 @@ public class ChatRoomController {
     ) {
         ChatRoomResponse response = chatRoomService.createChatRoom(username, request);
         return ApiResponse.success(response);
+    }
+
+    @Operation(summary = "[인증 필요] 채팅방 종료", description = "대화가 끝나고 채팅을 종료합니다.")
+    @PatchMapping("/{chatRoomId}")
+    public ApiResponse<ChatRoomResponse> updateChatRoom(@PathVariable Long chatRoomId) {
+        chatRoomService.updateChatRoomStatus(chatRoomId);
+        return ApiResponse.success();
     }
 
     @Operation(summary = "[인증 필요] 내 채팅방 목록 조회", description = "내가 참여한 모든 채팅방을 조회합니다.")

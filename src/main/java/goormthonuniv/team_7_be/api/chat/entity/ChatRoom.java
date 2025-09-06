@@ -3,6 +3,8 @@ package goormthonuniv.team_7_be.api.chat.entity;
 import goormthonuniv.team_7_be.api.member.entity.Member;
 import goormthonuniv.team_7_be.common.utils.BaseTimeEntity;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -31,9 +33,17 @@ public class ChatRoom extends BaseTimeEntity {
     @JoinColumn(name = "member2_id", nullable = false)
     private Member member2;
 
+    @Enumerated(EnumType.STRING)
+    private ChatRoomStatus status;
+
     @Builder
     public ChatRoom(Member member1, Member member2) {
         this.member1 = member1;
         this.member2 = member2;
+        this.status = ChatRoomStatus.OPEN;
+    }
+
+    public void closed() {
+        this.status = ChatRoomStatus.CLOSED;
     }
 }

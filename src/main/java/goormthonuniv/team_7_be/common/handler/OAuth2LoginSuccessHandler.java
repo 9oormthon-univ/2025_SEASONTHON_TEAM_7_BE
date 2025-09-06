@@ -28,19 +28,16 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-                                        Authentication authentication) throws IOException {
+        Authentication authentication) throws IOException {
         OAuth2User oAuth2User = (OAuth2User)authentication.getPrincipal();
 
         boolean isGuest = oAuth2User.getAuthorities().stream()
-                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals(MemberRole.GUEST.getKey()));
+            .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals(MemberRole.GUEST.getKey()));
 
         // ★ 수정된 부분: 이메일 정보는 공통으로 사용하므로 미리 추출
         Map<String, Object> attributes = oAuth2User.getAttributes();
         Map<String, Object> kakaoAccount = (Map<String, Object>)attributes.get("kakao_account");
         String email = (String)kakaoAccount.get("email");
-
-
-        log.info(attributes.toString());
 
         String targetUrl;
 
@@ -51,10 +48,10 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
             String signupToken = jwtProvider.generateSignupToken(email);
 
             targetUrl = UriComponentsBuilder.fromUriString("https://teetalk.vercel.app//signup/extra-info")
-                    .queryParam("signupToken", signupToken)
-                    .build()
-                    .encode(StandardCharsets.UTF_8)
-                    .toUriString();
+                .queryParam("signupToken", signupToken)
+                .build()
+                .encode(StandardCharsets.UTF_8)
+                .toUriString();
 
         } else {
             // 권한이 USER인 경우 (기존 사용자)
@@ -71,11 +68,11 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
             });
 
             targetUrl = UriComponentsBuilder.fromUriString("https://teetalk.vercel.app/")
-                    .queryParam("accessToken", accessToken)
-                    .queryParam("refreshToken", refreshToken)
-                    .build()
-                    .encode(StandardCharsets.UTF_8)
-                    .toUriString();
+                .queryParam("accessToken", accessToken)
+                .queryParam("refreshToken", refreshToken)
+                .build()
+                .encode(StandardCharsets.UTF_8)
+                .toUriString();
         }
 
         getRedirectStrategy().sendRedirect(request, response, targetUrl);

@@ -10,12 +10,17 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import goormthonuniv.team_7_be.common.response.ApiResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Map;
 
+@Tag(name = "Auth", description = "회원가입 관련 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/auth")
@@ -54,5 +59,11 @@ public class KakaoLoginController {
         TokenDto tokenDto = kakaoLoginService.completeSignUp(email,profileImageUrl,requestDto);
 
         return ResponseEntity.ok(tokenDto);
+    }
+
+    @Operation(summary = "닉네임 검증 API", description = "닉네임 중복을 검증합니다")
+    @PostMapping
+    public ApiResponse<Boolean> validateNickname(@RequestParam String nickname) {
+        return ApiResponse.success(kakaoLoginService.validateNickname(nickname));
     }
 }

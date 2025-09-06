@@ -15,4 +15,5 @@ public class SignUpRequestDto {
     private List<InterestedJob> interests;
     private MemberAge memberAge;
     private String introduceMySelf;
+
 }

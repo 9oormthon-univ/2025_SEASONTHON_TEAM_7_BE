@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 
 public record MemberProfileDto(
         Long memberId,
-        String profileImageUrl,
+      //  String profileImageUrl,
         String nickname,
         String age,
         String introduction,
@@ -16,7 +16,7 @@ public record MemberProfileDto(
     public static MemberProfileDto from(Member member) {
         return new MemberProfileDto(
                 member.getId(),
-                member.getProfileImageUrl(),
+                //member.getProfileImageUrl(),
                 member.getNickname(),
                 member.getMemberAge().getDisplayName(),
                 member.getIntroduceMySelf(),

@@ -27,7 +27,7 @@ public class Member extends BaseTimeEntity {
 
     private String nickname; // 추가 정보: 닉네임
 
-//    private String profileImageUrl;
+    private String profileImageUrl;
 
     @Enumerated(EnumType.STRING)
     private MemberAge memberAge; // 추가정보 : 연령대
@@ -77,9 +77,9 @@ public class Member extends BaseTimeEntity {
             this.mannerScore = (this.mannerScore + score) / 2;
         }
     }
-//    public void updateProfileImageUrl(String profileImageUrl) {
-//        this.profileImageUrl = profileImageUrl;
-//    }
+    public void updateProfileImageUrl(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
+    }
 
     /**
      * 리프레시 토큰 업데이트

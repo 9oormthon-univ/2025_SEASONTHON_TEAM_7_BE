@@ -27,8 +27,9 @@ public class Member extends BaseTimeEntity {
 
     private String nickname; // 추가 정보: 닉네임
 
+    private String profileImageUrl;
+
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private MemberAge memberAge; // 추가정보 : 연령대
 
     @ElementCollection(fetch = FetchType.LAZY) // 지연 로딩 설정
@@ -75,6 +76,9 @@ public class Member extends BaseTimeEntity {
         } else {
             this.mannerScore = (this.mannerScore + score) / 2;
         }
+    }
+    public void updateProfileImageUrl(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
     }
 
     /**

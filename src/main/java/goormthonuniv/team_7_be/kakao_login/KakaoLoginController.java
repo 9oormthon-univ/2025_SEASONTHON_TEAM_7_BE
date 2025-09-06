@@ -1,5 +1,7 @@
 package goormthonuniv.team_7_be.kakao_login;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -12,11 +14,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 
+import java.util.Map;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/auth")
 public class KakaoLoginController {
 
+    private static final Logger log = LoggerFactory.getLogger(KakaoLoginController.class);
     private final KakaoLoginService kakaoLoginService;
 
     @PostMapping("/signup")
@@ -28,7 +33,25 @@ public class KakaoLoginController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
 
-        TokenDto tokenDto = kakaoLoginService.completeSignUp(email, requestDto);
+        String profileImageUrl = null;
+        if (authentication.getPrincipal() instanceof OAuth2User) {
+            OAuth2User oauth2User = (OAuth2User) authentication.getPrincipal();
+
+            // 1. 전체 속성 맵을 가져옵니다.
+            Map<String, Object> attributes = oauth2User.getAttributes();
+
+
+            // 2. 'properties' 라는 키로 사용자 정보 맵을 가져옵니다. (기존의 'kakao_account' 대신)
+            Map<String, Object> properties = (Map<String, Object>) attributes.get("properties");
+
+            if (properties != null) {
+                // 3. 'properties' 맵에서 'profile_image_url'을 가져옵니다.
+                profileImageUrl = (String) properties.get("profile_image");
+            }
+        }
+        System.out.println("가져온 프로필 이미지 URL: " + profileImageUrl);
+
+        TokenDto tokenDto = kakaoLoginService.completeSignUp(email,profileImageUrl,requestDto);
 
         return ResponseEntity.ok(tokenDto);
     }

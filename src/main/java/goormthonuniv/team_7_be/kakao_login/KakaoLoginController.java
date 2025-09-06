@@ -23,7 +23,7 @@ import java.util.Map;
 @Tag(name = "Auth", description = "회원가입 관련 API")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/auth")
+@RequestMapping("/v1/auth")
 public class KakaoLoginController {
 
     private static final Logger log = LoggerFactory.getLogger(KakaoLoginController.class);

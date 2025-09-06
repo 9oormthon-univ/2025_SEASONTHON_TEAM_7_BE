@@ -1,9 +1,13 @@
 package goormthonuniv.team_7_be.common.auth.config;
 
-import java.util.List;
-
+import goormthonuniv.team_7_be.common.auth.filter.JwtAuthenticationFilter;
+import goormthonuniv.team_7_be.common.auth.resolver.AuthArgumentResolver;
+import goormthonuniv.team_7_be.common.config.CustomOAuth2UserService;
+import goormthonuniv.team_7_be.common.handler.OAuth2LoginSuccessHandler;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -17,11 +21,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import goormthonuniv.team_7_be.common.auth.filter.JwtAuthenticationFilter;
-import goormthonuniv.team_7_be.common.auth.resolver.AuthArgumentResolver;
-import goormthonuniv.team_7_be.common.config.CustomOAuth2UserService;
-import goormthonuniv.team_7_be.common.handler.OAuth2LoginSuccessHandler;
-import lombok.RequiredArgsConstructor;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -40,33 +40,35 @@ public class SecurityConfig implements WebMvcConfigurer {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            // 1. 기본적인 비활성화 설정
-            .csrf(AbstractHttpConfigurer::disable)
-            .cors(auth -> auth.configurationSource(corsConfigurationSource()))
-            .formLogin(AbstractHttpConfigurer::disable)
-            .httpBasic(AbstractHttpConfigurer::disable)
-            .sessionManagement(session ->
-                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                // 1. 기본적인 비활성화 설정
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(auth -> auth.configurationSource(corsConfigurationSource()))
+                .formLogin(AbstractHttpConfigurer::disable)
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-            // 2. JWT 인증 필터를 가장 먼저 배치
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                // 2. JWT 인증 필터를 가장 먼저 배치
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
 
-            // 3. OAuth2 로그인 설정
-            .oauth2Login(oauth2 -> oauth2
-                .userInfoEndpoint(userInfo -> userInfo
-                    .userService(customOAuth2UserService))
-                .successHandler(oAuth2LoginSuccessHandler)
-            )
+                // 3. OAuth2 로그인 설정
+                .oauth2Login(oauth2 -> oauth2
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(customOAuth2UserService))
+                        .successHandler(oAuth2LoginSuccessHandler)
+                )
 
-            // 4. 접근 권한 설정 (가장 마지막에 배치)
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers(
-                    "/login/**", "/oauth2/**", "/auth/**",
-                    "/swagger-ui/**", "/v3/api-docs/**",
-                    "/ws-connect/**", "/chat-test", "/pub/**", "/sub/**"
-                ).permitAll()
-                .anyRequest().authenticated() // 개발 편의를 위해 모든 요청 허용 (추후 변경 필요)
-            );
+                // 4. 접근 권한 설정 (가장 마지막에 배치)
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(
+                                "/login/**", "/oauth2/**", "/auth/**", "/v1/auth",
+                                "/swagger-ui/**", "/v3/api-docs/**",
+                                "/ws-connect/**", "/chat-test", "/pub/**", "/sub/**"
+                        ).permitAll()
+                        .requestMatchers(HttpMethod.POST, "/v1/auth").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/v1/auth/**").permitAll()
+                        .anyRequest().authenticated() // 개발 편의를 위해 모든 요청 허용 (추후 변경 필요)
+                );
 
         return http.build();
     }

@@ -1,5 +1,6 @@
 package goormthonuniv.team_7_be.api.manner.service;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,6 +14,7 @@ import goormthonuniv.team_7_be.api.manner.repository.MannerRepository;
 import goormthonuniv.team_7_be.api.member.entity.Member;
 import goormthonuniv.team_7_be.api.member.exception.MemberExceptionType;
 import goormthonuniv.team_7_be.api.member.repository.MemberRepository;
+import goormthonuniv.team_7_be.api.notification.event.MannerReviewCreatedEvent;
 import goormthonuniv.team_7_be.common.exception.BaseException;
 import lombok.RequiredArgsConstructor;
 
@@ -24,6 +26,7 @@ public class MannerService {
     private final MannerRepository mannerRepository;
     private final MemberRepository memberRepository;
     private final ChatRoomRepository chatRoomRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     public MannerResponse createManner(String email, MannerCreateRequest request) {
         Member member = memberRepository.findByEmail(email)
@@ -50,6 +53,9 @@ public class MannerService {
                 .review(request.review())
                 .build()
         );
+
+        // 이벤트 발행: 매너 후기 작성 알림
+        eventPublisher.publishEvent(new MannerReviewCreatedEvent(member, targetMember, request.rate(), request.review()));
 
         return MannerResponse.from(manner);
     }

@@ -52,7 +52,7 @@
     function connect() {
         chatRoomId = document.getElementById("chatRoomId").value;
 
-        const socket = new SockJS("/api/ws-connect");
+        const socket = new SockJS("https://34.47.125.208/api/ws-connect");
         stompClient = Stomp.over(socket);
 
         const token = getToken();

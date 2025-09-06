@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,6 +52,10 @@ public class Member extends BaseTimeEntity {
 
     private String refreshToken; // 리프레시 토큰
 
+    private Boolean isActive;
+
+    private LocalDateTime lastActiveAt;
+
     @Builder
     public Member(String email, MemberRole role, String profileImageUrl) {
         this.email = email;
@@ -87,5 +92,10 @@ public class Member extends BaseTimeEntity {
      */
     public void updateRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
+    }
+
+    public void updateIsActive() {
+        this.isActive = true;
+        this.lastActiveAt = LocalDateTime.now();
     }
 }

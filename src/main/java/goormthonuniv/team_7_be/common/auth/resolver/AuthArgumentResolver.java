@@ -1,24 +1,28 @@
 package goormthonuniv.team_7_be.common.auth.resolver;
 
+import goormthonuniv.team_7_be.api.member.entity.Member;
+import goormthonuniv.team_7_be.api.member.repository.MemberRepository;
+import goormthonuniv.team_7_be.common.auth.exception.AuthExceptionType;
+import goormthonuniv.team_7_be.common.exception.BaseException;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
-import goormthonuniv.team_7_be.common.auth.exception.AuthExceptionType;
-import goormthonuniv.team_7_be.common.auth.service.CustomOAuth2User;
-import goormthonuniv.team_7_be.common.exception.BaseException;
-import jakarta.servlet.http.HttpServletRequest;
-import lombok.extern.slf4j.Slf4j;
-
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class AuthArgumentResolver implements HandlerMethodArgumentResolver {
+
+    private final MemberRepository memberRepository;
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
@@ -26,16 +30,17 @@ public class AuthArgumentResolver implements HandlerMethodArgumentResolver {
     }
 
     @Override
+    @Transactional
     public Object resolveArgument(
-        MethodParameter parameter, ModelAndViewContainer mavContainer,
-        NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
+            MethodParameter parameter, ModelAndViewContainer mavContainer,
+            NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         // 인증 정보가 없는 경우 → IP 주소 반환
         if (authentication == null || !authentication.isAuthenticated()
-            || authentication.getPrincipal().equals("anonymousUser")) {
+                || authentication.getPrincipal().equals("anonymousUser")) {
 
-            HttpServletRequest request = (HttpServletRequest)webRequest.getNativeRequest();
+            HttpServletRequest request = (HttpServletRequest) webRequest.getNativeRequest();
             String ip = extractClientIp(request);
 
             log.info("익명 사용자 요청, IP: {}", ip);
@@ -48,6 +53,8 @@ public class AuthArgumentResolver implements HandlerMethodArgumentResolver {
             log.warn("No principal found");
             throw new BaseException(AuthExceptionType.UNAUTHORIZED);
         }
+
+        memberRepository.findByEmail(email).ifPresent(Member::updateIsActive);
 
         return email;
     }

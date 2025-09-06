@@ -30,19 +30,19 @@ public class KakaoLoginController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
 
-        String profileImageUrl = null;
-        if (authentication.getPrincipal() instanceof OAuth2User) {
-            OAuth2User oauth2User = (OAuth2User) authentication.getPrincipal();
-            Map<String, Object> kakaoAccount = oauth2User.getAttribute("kakao_account");
-            if (kakaoAccount != null) {
-                Map<String, Object> profile = (Map<String, Object>) kakaoAccount.get("profile");
-                if (profile != null) {
-                    profileImageUrl = (String) profile.get("profile_image_url");
-                }
-            }
-        }
+//        String profileImageUrl = null;
+//        if (authentication.getPrincipal() instanceof OAuth2User) {
+//            OAuth2User oauth2User = (OAuth2User) authentication.getPrincipal();
+//            Map<String, Object> kakaoAccount = oauth2User.getAttribute("kakao_account");
+//            if (kakaoAccount != null) {
+//                Map<String, Object> profile = (Map<String, Object>) kakaoAccount.get("profile");
+//                if (profile != null) {
+//                    profileImageUrl = (String) profile.get("profile_image_url");
+//                }
+//            }
+//        }
 
-        TokenDto tokenDto = kakaoLoginService.completeSignUp(email, profileImageUrl,requestDto);
+        TokenDto tokenDto = kakaoLoginService.completeSignUp(email,requestDto);
 
         return ResponseEntity.ok(tokenDto);
     }

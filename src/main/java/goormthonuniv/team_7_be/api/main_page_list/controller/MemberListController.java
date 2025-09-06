@@ -3,9 +3,11 @@ package goormthonuniv.team_7_be.api.main_page_list.controller;
 
 import goormthonuniv.team_7_be.api.main_page_list.dto.MemberProfileDto;
 import goormthonuniv.team_7_be.api.main_page_list.service.MemberListService;
+import goormthonuniv.team_7_be.api.member.entity.Member;
 import goormthonuniv.team_7_be.common.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,5 +23,11 @@ public class MemberListController {
     public ApiResponse<List<MemberProfileDto>> getMemberProfiles() {
         List<MemberProfileDto> members = memberListService.findAllMemberProfiles();
         return ApiResponse.success(members);
+    }
+
+    @GetMapping("/select/{memberId}")
+    public ApiResponse<MemberProfileDto> getMemberProfileById(@PathVariable Long memberId) {
+        MemberProfileDto member = memberListService.findMemberProfileById(memberId);
+        return ApiResponse.success(member);
     }
 }

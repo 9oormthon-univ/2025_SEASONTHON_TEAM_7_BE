@@ -37,15 +37,20 @@ public class NotificationController {
         return ApiResponse.success(notificationService.getMyNotifications(username));
     }
 
-    @Operation(summary = "[미구현] 모든 알림 읽음 처리", description = "모든 알림을 읽음 처리합니다.")
-    @PatchMapping
-    public ApiResponse<Void> markAllAsRead() {
+    @Operation(summary = "모든 알림 읽음 처리", description = "사용자의 모든 알림을 읽음 처리합니다.")
+    @PatchMapping("/read-all") // RESTful한 엔드포인트로 수정했습니다.
+    public ApiResponse<Void> markAllAsRead(
+            @Parameter(hidden = true) @Auth String email) { // @Auth 어노테이션으로 이메일 파라미터 받기
+        notificationService.markAllAsRead(email);
         return ApiResponse.success();
     }
 
-    @Operation(summary = "[미구현] 특정 알림 읽음 처리", description = "특정 알림을 읽음 처리합니다.")
-    @PatchMapping("/{notificationId}")
-    public ApiResponse<Void> markAsRead(@PathVariable Long notificationId) {
+    @Operation(summary = "특정 알림 읽음 처리", description = "특정 알림을 읽음 처리합니다.")
+    @PatchMapping("/read/{notificationId}")
+    public ApiResponse<Void> markAsRead(
+            @Parameter(description = "읽음 처리할 알림의 ID") @PathVariable Long notificationId,
+            @Parameter(hidden = true) @Auth String email) { // 사용자 식별을 위해 email 파라미터 추가
+        notificationService.markAsRead(notificationId, email);
         return ApiResponse.success();
     }
 }

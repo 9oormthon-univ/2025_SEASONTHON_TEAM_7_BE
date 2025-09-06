@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 public enum MemberExceptionType implements ExceptionType {
 
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER-001", "멤버를 찾을 수 없습니다."),
+    MEMBER_EXCEPTION_TYPE(HttpStatus.FORBIDDEN, "MEMBER-002", "권한이 없는 접근입니다.")
     ;
 
     private final HttpStatus httpStatus;

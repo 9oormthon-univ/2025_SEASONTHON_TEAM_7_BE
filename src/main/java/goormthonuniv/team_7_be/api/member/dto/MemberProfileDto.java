@@ -1,4 +1,4 @@
-package goormthonuniv.team_7_be.api.main_page_list.dto;
+package goormthonuniv.team_7_be.api.member.dto;
 
 import goormthonuniv.team_7_be.api.member.entity.Member;
 

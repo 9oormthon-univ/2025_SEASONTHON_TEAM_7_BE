@@ -1,6 +1,9 @@
-package goormthonuniv.team_7_be.api.main_page_list.service;
+package goormthonuniv.team_7_be.api.member.service;
 
-import goormthonuniv.team_7_be.api.main_page_list.dto.MemberProfileDto;
+import goormthonuniv.team_7_be.api.coffee.entity.CoffeeChat;
+import goormthonuniv.team_7_be.api.coffee.exception.CoffeeChatExceptionType;
+import goormthonuniv.team_7_be.api.coffee.repository.CoffeeChatRepository;
+import goormthonuniv.team_7_be.api.member.dto.MemberProfileDto;
 import goormthonuniv.team_7_be.api.member.entity.Member;
 import goormthonuniv.team_7_be.api.member.entity.MemberRole;
 import goormthonuniv.team_7_be.api.member.exception.MemberExceptionType;
@@ -15,9 +18,10 @@ import java.util.List;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class MemberListService {
+public class MemberService {
 
     private final MemberRepository memberRepository;
+    private final CoffeeChatRepository coffeeChatRepository;
 
     public List<MemberProfileDto> findAllMemberProfiles(String username) {
         List<Member> members = memberRepository.findAllNotInEmailAndRole(username, MemberRole.USER);
@@ -29,6 +33,16 @@ public class MemberListService {
     public MemberProfileDto findMemberProfileById(String username) {
         Member member = memberRepository.findByEmail(username)
                 .orElseThrow(() -> new BaseException(MemberExceptionType.MEMBER_NOT_FOUND));
+        return MemberProfileDto.from(member);
+    }
+
+    public MemberProfileDto findMemberProfile(Long coffeeChatId) {
+        CoffeeChat coffeeChat = coffeeChatRepository.findById(coffeeChatId)
+                .orElseThrow(() -> new BaseException(CoffeeChatExceptionType.COFFEE_CHAT_NOT_FOUND));
+
+        Member member = memberRepository.findById(coffeeChat.getReceiver().getId())
+                .orElseThrow(() -> new BaseException(MemberExceptionType.MEMBER_NOT_FOUND));
+
         return MemberProfileDto.from(member);
     }
 }

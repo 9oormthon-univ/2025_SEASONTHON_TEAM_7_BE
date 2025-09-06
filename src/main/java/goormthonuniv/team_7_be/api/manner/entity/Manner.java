@@ -25,8 +25,12 @@ public class Manner extends BaseTimeEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false)
-    private Member member;
+    @JoinColumn(name = "reviewer_id", nullable = false)
+    private Member reviewer; //평가 하는 사람
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "receiver_id", nullable = false)
+    private Member receiver; //평가 받는 사람
 
     private Integer rate; // 매너 점수
 
@@ -34,8 +38,9 @@ public class Manner extends BaseTimeEntity {
     private String review; // 매너 후기
 
     @Builder
-    public Manner(Member member, Integer rate, String review) {
-        this.member = member;
+    public Manner(Member reviewer, Member receiver, Integer rate, String review) {
+        this.reviewer = reviewer;
+        this.receiver = receiver;
         this.rate = rate;
         this.review = review;
     }
